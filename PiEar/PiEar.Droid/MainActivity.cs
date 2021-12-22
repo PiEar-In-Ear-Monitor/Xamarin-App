@@ -8,7 +8,7 @@ using Android.OS;
 
 namespace PiEar.Droid
 {
-    [Activity(Label = "PiEar", Theme = "@style/MainTheme", MainLauncher = true,
+    [Activity(Label = "Pi-Ear", Icon = "@mipmap/icon", Theme = "@style/MainTheme", MainLauncher = true,
         ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {

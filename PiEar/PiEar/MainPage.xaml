@@ -1,14 +1,74 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:PiEar"
-             x:Class="PiEar.MainPage">
-
-    <StackLayout>
-        <!-- Place new controls here -->
-        <Label Text="Welcome to Xamarin.Forms!" 
-           HorizontalOptions="Center"
-           VerticalOptions="CenterAndExpand" />
-    </StackLayout>
+             x:Class="PiEar.MainPage" >
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="60"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="125"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="50"/>
+        </Grid.ColumnDefinitions>
+        
+        <!-- Color for entire page -->
+        <!-- Text color black -->
+        <Label 
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.RowSpan="3"
+            Grid.ColumnSpan="3"
+            BackgroundColor="White"/>
+        
+        <!-- Header -->
+        <Image
+            Grid.Row="0"
+            Grid.Column="0"
+            Source="icon"
+            HeightRequest="60"
+            WidthRequest="60"
+            HorizontalOptions="Start"
+            VerticalOptions="CenterAndExpand" />
+        <Label
+            Grid.Row="0"
+            Grid.Column="0"
+            Text="Pi-Ear"
+            FontSize="Large"
+            TextColor="Black"
+            HorizontalOptions="End"
+            VerticalOptions="CenterAndExpand" />
+        
+        <ImageButton
+            Grid.Row="0"
+            Grid.Column="2"
+            Source="menu"
+            HeightRequest="60"
+            WidthRequest="60"
+            HorizontalOptions="End"
+            VerticalOptions="CenterAndExpand"
+            BackgroundColor="Transparent"
+            Clicked="OnImageButtonClicked" />
+        
+        <!-- Body -->
+        <StackLayout Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"  x:Name="SlidersBody">
+            
+            <Label 
+                x:Name="Label"
+                Text="0 ImageButton clicks"
+                TextColor="Black"
+                HorizontalOptions="End"
+                VerticalOptions="Start" />
+            
+        </StackLayout>
+        
+        <StackLayout Grid.Row="2" Grid.Column="2" >
+            <Switch></Switch>
+            <Stepper></Stepper>
+        </StackLayout>
+    </Grid>
 
 </ContentPage>

@@ -6,6 +6,10 @@ using Xamarin.Forms.Xaml;
 
 namespace PiEar
 {
+    public static class GlobalVariables
+    {
+        public static int numberOfStreams = 10;
+    }
     public partial class App : Application
     {
         public App()
