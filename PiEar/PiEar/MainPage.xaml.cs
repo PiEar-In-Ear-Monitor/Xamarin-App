@@ -54,7 +54,7 @@ namespace PiEar
                 {
                     channelVolume.Text = $"{qe.NewValue:F02}%";
                 };
-                lSolo = new ImageButton
+                // Solo = new ImageButton
                 // {
                 //     Source="solo",
                 //     WidthRequest =30,
