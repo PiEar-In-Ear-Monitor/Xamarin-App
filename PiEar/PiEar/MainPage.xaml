@@ -42,32 +42,38 @@
             HorizontalOptions="End"
             VerticalOptions="CenterAndExpand" />
         
-        <ImageButton
-            Grid.Row="0"
-            Grid.Column="2"
-            Source="menu"
-            HeightRequest="60"
-            WidthRequest="60"
-            HorizontalOptions="End"
-            VerticalOptions="CenterAndExpand"
-            BackgroundColor="Transparent"
-            Clicked="OnImageButtonClicked" />
-        
         <!-- Body -->
-        <StackLayout Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"  x:Name="SlidersBody">
-            
-            <Label 
-                x:Name="Label"
-                Text="0 ImageButton clicks"
-                TextColor="Black"
-                HorizontalOptions="End"
-                VerticalOptions="Start" />
-            
-        </StackLayout>
+        <StackLayout Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"  x:Name="SlidersBody" />
         
-        <StackLayout Grid.Row="2" Grid.Column="2" >
-            <Switch></Switch>
-            <Stepper></Stepper>
+        <StackLayout Grid.Row="2" Grid.Column="0" Orientation="Horizontal" Grid.ColumnSpan="3" >
+            <Switch 
+                VerticalOptions="Center"
+                HorizontalOptions="Start"
+                HeightRequest="60"
+                WidthRequest="60"/>
+            <Label
+                x:Name="StepperStepCount"
+                Text="+10 &#10132; +5"
+                TextType="Html"
+                HorizontalOptions="Start"
+                VerticalOptions="CenterAndExpand">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnChangeBPMStep" />
+                </Label.GestureRecognizers>
+            </Label>
+            <Stepper 
+                x:Name="BpmStepper"
+                VerticalOptions="Center"
+                HorizontalOptions="Center"
+                Maximum = "200"
+                Value="100"
+                Increment = "10"
+                ValueChanged="OnChangeBPM"/>
+            <Label 
+                x:Name="CountBpm"
+                Text="BPM 100" 
+                VerticalOptions="Center"
+                HorizontalOptions="End"/>
         </StackLayout>
     </Grid>
 

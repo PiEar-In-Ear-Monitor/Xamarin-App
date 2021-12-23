@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Linq;
 using Xamarin.Forms;
 
 namespace PiEar
 {
     public partial class MainPage : ContentPage
     {
-        int _clickTotal;
         public MainPage()
         {
             InitializeComponent();
@@ -17,19 +18,10 @@ namespace PiEar
                 {
                     Text = $"Channel {i + 1}",
                     TextColor = Color.Black,
+                    WidthRequest = 100,
                     HorizontalOptions = LayoutOptions.Start,
-                    VerticalTextAlignment = TextAlignment.Center
+                    VerticalTextAlignment = TextAlignment.Center,
                 };
-                channelLabel.GestureRecognizers.Add(
-                    new TapGestureRecognizer()
-                    {
-                        NumberOfTapsRequired    = 2,
-                        Command = new Command(() =>
-                        {
-                            TapGestureRecognizer_OnTapped(channelLabel);
-                        })
-                    }
-                );
                 
                 // Volume Indicator
                 Label channelVolume = new Label
@@ -46,22 +38,11 @@ namespace PiEar
                     BackgroundColor = Color.Gray,
                     HorizontalOptions = LayoutOptions.CenterAndExpand,
                     VerticalOptions = LayoutOptions.Center,
-                    WidthRequest = 200,
+                    WidthRequest = 170,
                     HeightRequest = 30,
                     Maximum = 1.20
                 };
-                channelSlider.ValueChanged += (q, qe) =>
-                {
-                    channelVolume.Text = $"{qe.NewValue:F02}%";
-                };
-                // Solo = new ImageButton
-                // {
-                //     Source="solo",
-                //     WidthRequest =30,
-                //     HorizontalOptions=LayoutOptions.End,
-                //     VerticalOptions=LayoutOptions.Center,
-                //     BackgroundColor=Color.Transparent
-                // };
+
                 // Mute Button
                 ImageButton channelMute = new ImageButton
                 {
@@ -71,26 +52,6 @@ namespace PiEar
                     VerticalOptions=LayoutOptions.Center,
                     BackgroundColor=Color.Transparent
                 };
-                channelMute.Command = new Command(() =>
-                    {
-                        OnMuteClick(channelMute, channelSlider, channelVolume);
-                    }   
-                );
-                
-                // Solo Button
-                // ImageButton channelSolo = new ImageButton
-                // {
-                //     Source="solo",
-                //     WidthRequest =30,
-                //     HorizontalOptions=LayoutOptions.End,
-                //     VerticalOptions=LayoutOptions.Center,
-                //     BackgroundColor=Color.Transparent
-                // };
-                // channelMute.Command = new Command(() =>
-                //     {
-                //         OnSoloClick(i);
-                //     }   
-                // );
                 
                 // New Row
                 var newLayout = new StackLayout
@@ -103,10 +64,32 @@ namespace PiEar
                         channelLabel,
                         channelSlider,
                         channelVolume,
-                        channelMute,
-                        // channelSolo
+                        channelMute
                     }
                 };
+                
+                // Button Actions
+                channelLabel.GestureRecognizers.Add(
+                    new TapGestureRecognizer()
+                    {
+                        NumberOfTapsRequired    = 2,
+                        Command = new Command(() =>
+                        {
+                            TapGestureRecognizer_OnTapped(channelLabel);
+                        })
+                    }
+                );
+                
+                channelSlider.ValueChanged += (q, qe) =>
+                {
+                    channelVolume.Text = $"{qe.NewValue:F02}%";
+                };
+                
+                channelMute.Command = new Command(() =>
+                    {
+                        OnMuteClick(channelMute, channelSlider, channelVolume);
+                    }   
+                );
 
                 
                 SlidersBody.Children.Add(newLayout);
@@ -116,26 +99,22 @@ namespace PiEar
                  */
             }
         }
-        
-        private void OnImageButtonClicked(object sender, EventArgs e)
-        {
-            _clickTotal += 1;
-            Label.Text = $"{_clickTotal} ImageButton click{(_clickTotal == 1 ? "" : "s")}";
-        }
 
         private async void TapGestureRecognizer_OnTapped(Label sender)
         {
             try
             {
                 string newName = await DisplayPromptAsync("What would you like to name this channel?", "");
+                Debug.Write($"{newName}\n");
                 if (newName.Length > 0)
                 {
-                    sender.Text = newName;
+                    sender.Text = ((newName.Length > 26 ) ? newName.Substring(0, 26) : newName );
                 }
 
             }
             catch (Exception e)
             {
+                Debug.Write($"Error: {e}\n");
             }
         }
 
@@ -145,28 +124,38 @@ namespace PiEar
             {
                 button.Source = "mute";
                 slider.IsEnabled = false;
-                volume.Text = $"{0.0:F02}%";
+                volume.TextDecorations = TextDecorations.Strikethrough;
             }
             else
             {
                 button.Source = "unmute";
                 slider.IsEnabled = true;
-                volume.Text = $"{slider.Value:F02}%";
+                volume.TextDecorations = TextDecorations.None;
             }
         }
 
-        // private void OnSoloClick(int i)
-        // {
-        //     for (int j = 0; j < SlidersBody.Children.Count; j++)
-        //     {
-        //         if (j == i)
-        //         {
-        //             continue;
-        //         }
-        //
-        //         View row = SlidersBody.Children[i];
-        //         OnMuteClick(row[3], row[1], row[2]);   
-        //     }
-        // }
+        private void OnChangeBPM(object sender, ValueChangedEventArgs e)
+        {
+            CountBpm.Text = $"BPM {e.NewValue:F0}";
+        }
+
+        private void OnChangeBPMStep(object sender, EventArgs e)
+        {
+            if (StepperStepCount.Text == "+1 &#10132; +10")
+            {
+                BpmStepper.Increment = 10;
+                StepperStepCount.Text = "+10 &#10132; +5";
+            }
+            else if (StepperStepCount.Text == "+10 &#10132; +5")
+            {
+                BpmStepper.Increment = 5;
+                StepperStepCount.Text = "+5 &#10132; +1";
+            } 
+            else
+            {
+                BpmStepper.Increment = 1;
+                StepperStepCount.Text = "+1 &#10132; +10";
+            }
+        }
     }
 }
