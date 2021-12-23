@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 using Xamarin.Forms;
 
 namespace PiEar
@@ -52,6 +55,17 @@ namespace PiEar
                     VerticalOptions=LayoutOptions.Center,
                     BackgroundColor=Color.Transparent
                 };
+
+                // Pan Button
+                Image channelPan = new Image
+                {
+                    Source="rotate",
+                    WidthRequest  = 30,
+                    HeightRequest = 30,
+                    HorizontalOptions=LayoutOptions.End,
+                    VerticalOptions=LayoutOptions.Center,
+                    BackgroundColor=Color.Transparent
+                };
                 
                 // New Row
                 var newLayout = new StackLayout
@@ -64,7 +78,8 @@ namespace PiEar
                         channelLabel,
                         channelSlider,
                         channelVolume,
-                        channelMute
+                        channelMute,
+                        channelPan
                     }
                 };
                 
@@ -87,16 +102,54 @@ namespace PiEar
                 
                 channelMute.Command = new Command(() =>
                     {
-                        OnMuteClick(channelMute, channelSlider, channelVolume);
+                        if (channelSlider.IsEnabled)
+                        {
+                            channelMute.Source = "mute";
+                            channelSlider.IsEnabled = false;
+                            channelVolume.TextDecorations = TextDecorations.Strikethrough;
+                        }
+                        else
+                        {
+                            channelMute.Source = "unmute";
+                            channelSlider.IsEnabled = true;
+                            channelVolume.TextDecorations = TextDecorations.None;
+                        }
                     }   
                 );
+                
+                PanGestureRecognizer panGesture = new PanGestureRecognizer();
+                panGesture.PanUpdated += (s, e) => {
+                    switch (e.StatusType)
+                    {
+                        case GestureStatus.Started:
+                        case GestureStatus.Running:
+                            if (e.TotalY > 0)
+                            {
+                                channelPan.Rotation = channelPan.Rotation + 7;
+                            }
+                            if (e.TotalY < 0)
+                            {
+                                channelPan.Rotation = channelPan.Rotation - 7;
+                            }
+                            break;
+                        case GestureStatus.Completed:
+                        case GestureStatus.Canceled:
+                        default:
+                            break;
+                    }
 
+                    if (channelPan.Rotation > 130)
+                    {
+                        channelPan.Rotation = 130;
+                    } else if (channelPan.Rotation < -130)
+                    {
+                        channelPan.Rotation = -130;
+                    }
+                };
+                channelPan.GestureRecognizers.Add(panGesture);
                 
                 SlidersBody.Children.Add(newLayout);
-                /*
-                    Clicked="ImageButton_Mute"
-                    Clicked="ImageButton_Solo"
-                 */
+                
             }
         }
 
@@ -115,22 +168,6 @@ namespace PiEar
             catch (Exception e)
             {
                 Debug.Write($"Error: {e}\n");
-            }
-        }
-
-        private void OnMuteClick(ImageButton button, Slider slider, Label volume)
-        {
-            if (slider.IsEnabled)
-            {
-                button.Source = "mute";
-                slider.IsEnabled = false;
-                volume.TextDecorations = TextDecorations.Strikethrough;
-            }
-            else
-            {
-                button.Source = "unmute";
-                slider.IsEnabled = true;
-                volume.TextDecorations = TextDecorations.None;
             }
         }
 
