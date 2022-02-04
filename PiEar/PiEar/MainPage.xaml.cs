@@ -1,21 +1,24 @@
 ﻿using System;
 using System.Diagnostics;
 using Xamarin.Forms;
+using System.Collections.Generic;
 
 namespace PiEar
 {
-    public partial class MainPage : ContentPage
+    public partial class MainPage
     {
         public MainPage()
         {
             InitializeComponent();
+            List<Stream> streams = new List<Stream>();
 
             for (int i = 0; i < GlobalVariables.numberOfStreams; i++)
             {
+                streams.Add(new Stream($"Channel {i + 1}"));
                 // Channel Label
                 Label channelLabel = new Label
                 {
-                    Text = $"Channel {i + 1}",
+                    Text = streams[streams.Count - 1].Label,
                     TextColor = Color.Black,
                     WidthRequest = 100,
                     HorizontalOptions = LayoutOptions.Start,
@@ -27,7 +30,8 @@ namespace PiEar
                 {
                   Text = "0.00%",
                   HorizontalOptions = LayoutOptions.End,
-                  VerticalOptions = LayoutOptions.Center
+                  VerticalOptions = LayoutOptions.Center,
+                  
                 };
                 
                 // Channel Slider
@@ -39,7 +43,8 @@ namespace PiEar
                     VerticalOptions = LayoutOptions.Center,
                     WidthRequest = 170,
                     HeightRequest = 30,
-                    Maximum = 1.20
+                    Maximum = 1.20,
+                    Value = streams[streams.Count - 1].Volume
                 };
 
                 // Mute Button
@@ -60,7 +65,8 @@ namespace PiEar
                     HeightRequest = 30,
                     HorizontalOptions=LayoutOptions.End,
                     VerticalOptions=LayoutOptions.Center,
-                    BackgroundColor=Color.Transparent
+                    BackgroundColor=Color.Transparent,
+                    Rotation = streams[streams.Count - 1].Pan
                 };
                 
                 // New Row
@@ -72,10 +78,10 @@ namespace PiEar
                     Children =
                     {
                         channelLabel,
+                        channelPan,
                         channelSlider,
                         channelVolume,
-                        channelMute,
-                        channelPan
+                        channelMute
                     }
                 };
                 
@@ -115,23 +121,17 @@ namespace PiEar
                 
                 PanGestureRecognizer panGesture = new PanGestureRecognizer();
                 panGesture.PanUpdated += (s, e) => {
-                    switch (e.StatusType)
+                    const int offset = 2;
+                    if (e.StatusType == GestureStatus.Running)
                     {
-                        case GestureStatus.Started:
-                        case GestureStatus.Running:
-                            if (e.TotalY > 0)
-                            {
-                                channelPan.Rotation = channelPan.Rotation + 7;
-                            }
-                            if (e.TotalY < 0)
-                            {
-                                channelPan.Rotation = channelPan.Rotation - 7;
-                            }
-                            break;
-                        case GestureStatus.Completed:
-                        case GestureStatus.Canceled:
-                        default:
-                            break;
+                        if (e.TotalX > 0)
+                        {
+                            channelPan.Rotation = channelPan.Rotation + offset;
+                        }
+                        if (e.TotalX < 0)
+                        {
+                            channelPan.Rotation = channelPan.Rotation - offset;
+                        }
                     }
 
                     if (channelPan.Rotation > 130)
@@ -141,11 +141,10 @@ namespace PiEar
                     {
                         channelPan.Rotation = -130;
                     }
+                    Debug.WriteLine($"({e.TotalX}, {e.TotalY})");
                 };
                 channelPan.GestureRecognizers.Add(panGesture);
-                
                 SlidersBody.Children.Add(newLayout);
-                
             }
         }
 
