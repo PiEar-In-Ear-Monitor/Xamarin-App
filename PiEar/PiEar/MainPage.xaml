@@ -44,6 +44,7 @@
         
         <!-- Body -->
         <StackLayout Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"  x:Name="SlidersBody" />
+        <!-- <ListView Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"  x:Name="SlidersBody" /> -->
         
         <StackLayout Grid.Row="2" Grid.Column="0" Orientation="Horizontal" Grid.ColumnSpan="3" >
             <Switch 

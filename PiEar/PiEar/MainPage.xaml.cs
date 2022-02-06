@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using Xamarin.Forms;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace PiEar
 {
@@ -144,8 +145,10 @@ namespace PiEar
                     Debug.WriteLine($"({e.TotalX}, {e.TotalY})");
                 };
                 channelPan.GestureRecognizers.Add(panGesture);
+                // GlobalVariables.itemList.Add(newLayout);
                 SlidersBody.Children.Add(newLayout);
             }
+            // SlidersBody.ItemsSource = GlobalVariables.itemList;
         }
 
         private async void TapGestureRecognizer_OnTapped(Label sender)
