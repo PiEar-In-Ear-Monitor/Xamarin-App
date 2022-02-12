@@ -13,7 +13,7 @@ namespace PiEar
             InitializeComponent();
             List<Stream> streams = new List<Stream>();
 
-            for (int i = 0; i < GlobalVariables.numberOfStreams; i++)
+            for (int i = 0; i < GlobalVariables.NumberOfStreams; i++)
             {
                 streams.Add(new Stream($"Channel {i + 1}"));
                 // Channel Label
@@ -122,17 +122,9 @@ namespace PiEar
                 
                 PanGestureRecognizer panGesture = new PanGestureRecognizer();
                 panGesture.PanUpdated += (s, e) => {
-                    const int offset = 2;
                     if (e.StatusType == GestureStatus.Running)
                     {
-                        if (e.TotalX > 0)
-                        {
-                            channelPan.Rotation = channelPan.Rotation + offset;
-                        }
-                        if (e.TotalX < 0)
-                        {
-                            channelPan.Rotation = channelPan.Rotation - offset;
-                        }
+                        channelPan.Rotation += e.TotalX / 2.0;
                     }
 
                     if (channelPan.Rotation > 130)
@@ -145,10 +137,11 @@ namespace PiEar
                     Debug.WriteLine($"({e.TotalX}, {e.TotalY})");
                 };
                 channelPan.GestureRecognizers.Add(panGesture);
-                // GlobalVariables.itemList.Add(newLayout);
+                // GlobalVariables.ItemList.Add(newLayout);
                 SlidersBody.Children.Add(newLayout);
             }
-            // SlidersBody.ItemsSource = GlobalVariables.itemList;
+
+            // ListOfChannels.ItemsSource = GlobalVariables.ItemList;
         }
 
         private async void TapGestureRecognizer_OnTapped(Label sender)
@@ -173,24 +166,34 @@ namespace PiEar
         {
             CountBpm.Text = $"BPM {e.NewValue:F0}";
         }
-
+        
         private void OnChangeBPMStep(object sender, EventArgs e)
         {
-            if (StepperStepCount.Text == "+1 &#10132; +10")
+            switch (StepperStepCount.Text)
             {
-                BpmStepper.Increment = 10;
-                StepperStepCount.Text = "+10 &#10132; +5";
+                case "+1 &#10132; +10":
+                    BpmStepper.Increment = 10;
+                    StepperStepCount.Text = "+10 &#10132; +5";
+                    break;
+                case "+10 &#10132; +5":
+                    BpmStepper.Increment = 5;
+                    StepperStepCount.Text = "+5 &#10132; +1";
+                    break;
+                default:
+                    BpmStepper.Increment = 1;
+                    StepperStepCount.Text = "+1 &#10132; +10";
+                    break;
             }
-            else if (StepperStepCount.Text == "+10 &#10132; +5")
-            {
-                BpmStepper.Increment = 5;
-                StepperStepCount.Text = "+5 &#10132; +1";
-            } 
-            else
-            {
-                BpmStepper.Increment = 1;
-                StepperStepCount.Text = "+1 &#10132; +10";
-            }
+        }
+
+        private async void OpenSettings(object sender, EventArgs e)
+        {
+            await this.Navigation.PushAsync(new Settings());
+        }
+
+        private async void OpenAbout(object sender, EventArgs e)
+        {
+            await this.Navigation.PushAsync(new About());
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -9,16 +9,17 @@ namespace PiEar
 {
     public static class GlobalVariables
     {
-        public static ObservableCollection<StackLayout> itemList;
-        public static int numberOfStreams = 10;
+        public static ObservableCollection<StackLayout> ItemList;
+        public static int NumberOfStreams = 10;
     }
-    public partial class App : Application
+    public partial class App
     {
         public App()
         {
             InitializeComponent();
-
-            MainPage = new MainPage();
+            
+            var mainPage = new NavigationPage(new MainPage());
+            this.MainPage = mainPage;
         }
 
         protected override void OnStart()
