@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using PiEar.Models;
+using PiEar.Views;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -9,8 +11,8 @@ namespace PiEar
 {
     public static class GlobalVariables
     {
-        public static ObservableCollection<StackLayout> ItemList;
-        public static int NumberOfStreams = 10;
+        public static ObservableCollection<Stream> Streams = new ObservableCollection<Stream>();
+        public static int NumberOfStreams = 20;
     }
     public partial class App
     {
