@@ -9,7 +9,7 @@ using Android.App;
 [assembly: AssemblyTitle("PiEar.Droid")]
 [assembly: AssemblyDescription("Paired with PiEar, you can listen to everyone on stage!")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Alexander O'Connor")]
+[assembly: AssemblyCompany("OConnor")]
 [assembly: AssemblyProduct("PiEar.Droid")]
 [assembly: AssemblyCopyright("Copyright © Alexander O'Connor 2022")]
 [assembly: AssemblyTrademark("")]

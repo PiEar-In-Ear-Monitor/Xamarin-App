@@ -39,13 +39,15 @@ namespace PiEar
                 Slider channelSlider = new Slider
                 {
                     ThumbColor = Color.Black,
-                    BackgroundColor = Color.Gray,
+                    MinimumTrackColor = Color.Black,
+                    MaximumTrackColor = Color.Aqua,
+                    BackgroundColor = Color.Transparent,
                     HorizontalOptions = LayoutOptions.CenterAndExpand,
                     VerticalOptions = LayoutOptions.Center,
                     WidthRequest = 170,
                     HeightRequest = 30,
                     Maximum = 1.20,
-                    Value = streams[streams.Count - 1].Volume
+                    Value = streams[streams.Count - 1].VolumeDouble
                 };
 
                 // Mute Button
@@ -61,7 +63,7 @@ namespace PiEar
                 // Pan Button
                 Image channelPan = new Image
                 {
-                    Source="rotate",
+                    Source="pan",
                     WidthRequest  = 30,
                     HeightRequest = 30,
                     HorizontalOptions=LayoutOptions.End,
