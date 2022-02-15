@@ -1,8 +1,14 @@
 using System;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Windows.Input;
+using PiEar.Annotations;
+using Xamarin.Forms;
 
 namespace PiEar.Models
 {
-    public class Stream
+    public class Stream : INotifyPropertyChanged
     {
         // Internal ID, Useful???
         private static int _count = 0;
@@ -23,6 +29,29 @@ namespace PiEar.Models
         public Stream(string label)
         {
             Label = label;
+        }
+
+        protected Stream()
+        {
+            Label = $"Channel {_count + 1}";
+        }
+        // Commands to bind to
+        public static ICommand LabelTap => new Command(_labelTap);
+        public static ICommand ImageTap => new Command(_imageTap);
+        private static void _labelTap ()  {
+            Debug.WriteLine ("LabelTap");
+        }
+        private static void _imageTap ()  {
+            Debug.WriteLine ("ImageTap");
+        }
+        
+        // Property Changed Default
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

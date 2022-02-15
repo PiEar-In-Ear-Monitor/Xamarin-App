@@ -1,8 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:model="clr-namespace:PiEar.Models;assembly=PiEar"
-             xmlns:local="clr-namespace:PiEar.Controllers;assembly=PiEar"
+             xmlns:models="clr-namespace:PiEar.Models;assembly=PiEar"
              x:Class="PiEar.Views.MainPage">
     <ContentPage.ToolbarItems>
         <ToolbarItem
@@ -18,24 +17,25 @@
         x:Name="ListOfChannels"
         SelectionMode="None">
         <ListView.ItemTemplate>
-            <DataTemplate >  <!-- x:DataType="model:Stream" -->
+            <DataTemplate>
                 <ViewCell>
                     <ViewCell.View>
                         <StackLayout 
                             Orientation="Horizontal"
                             HorizontalOptions="CenterAndExpand"
-                            VerticalOptions="Start">
-                            <Label 
-                                Text="{Binding Id}"
-                                IsVisible="False"/>
+                            VerticalOptions="Start"
+                            x:DataType="models:Stream">
                             <Label
                                 Text="{Binding Label}"
                                 TextColor="Black" WidthRequest="100"
                                 HorizontalOptions="Start"
                                 VerticalTextAlignment="Center">
-                                <Label.GestureRecognizers>
-                                    <TapGestureRecognizer NumberOfTapsRequired="2"  Command="{Binding LabelTap}" CommandParameter="{Binding Id}"/>
-                                </Label.GestureRecognizers>
+                                <!-- <Label.GestureRecognizers> -->
+                                <!--     <TapGestureRecognizer -->
+                                <!--         NumberOfTapsRequired="2" -->
+                                <!--         Command="{Binding LabelTap}"/> -->
+                                <!--         ~1~ CommandParameter="{Binding Id}"/> @1@ -->
+                                <!-- </Label.GestureRecognizers> -->
                             </Label>
                             <!-- <Image -->
                             <!--     WidthRequest="30" -->
@@ -59,27 +59,34 @@
                                 HeightRequest="30"
                                 Maximum="1.2"
                                 Value="{Binding VolumeMultiplier}"
-                                IsEnabled="{Binding NotMute}"
-                                ValueChanged="Slider_OnValueChanged"/>
+                                IsEnabled="{Binding NotMute}"/>
                             <Label
                                 HorizontalOptions="End"
                                 VerticalOptions="Center"
-                                Text="{Binding Path=VolumeMultiplier, StringFormat='%{0:F02}'}"/>                
+                                Text="{Binding Path=VolumeMultiplier, StringFormat='{0:F02}%'}"/>                
                             <ImageButton
                                 WidthRequest="30"
                                 HeightRequest="30"
                                 HorizontalOptions="End"
                                 VerticalOptions="Center"
                                 BackgroundColor="Transparent"
-                                Source="{Binding ImageSource}"
-                                Clicked="TapGestureRecognizer_MuteButton"/>
+                                Source="{Binding ImageSource}">
+                                <!-- <ImageButton.GestureRecognizers> -->
+                                <!--     <TapGestureRecognizer  -->
+                                <!--         NumberOfTapsRequired="2" -->
+                                <!--         Command="{Binding ImageTap}" -->
+                                <!--         CommandParameter="{Binding Id}"/> -->
+                                <!-- </ImageButton.GestureRecognizers> -->
+                            </ImageButton>
                         </StackLayout>
                     </ViewCell.View>
                 </ViewCell>
             </DataTemplate>
         </ListView.ItemTemplate>
         <ListView.Footer>
-            <StackLayout Orientation="Horizontal" >
+            <StackLayout
+                Orientation="Horizontal"
+                x:DataType="models:Click">
                 <Switch 
                     VerticalOptions="Center"
                     HorizontalOptions="Start"
