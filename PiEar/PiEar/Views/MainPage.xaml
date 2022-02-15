@@ -1,7 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="PiEar.Views.MainPage" >
+             xmlns:model="clr-namespace:PiEar.Models;assembly=PiEar"
+             xmlns:local="clr-namespace:PiEar.Controllers;assembly=PiEar"
+             x:Class="PiEar.Views.MainPage">
     <ContentPage.ToolbarItems>
         <ToolbarItem
             IconImageSource="icon"
@@ -12,64 +14,68 @@
             Clicked="OpenAbout"
         />
     </ContentPage.ToolbarItems>
-    <ListView x:Name="ListOfChannels" >
+    <ListView 
+        x:Name="ListOfChannels"
+        SelectionMode="None">
         <ListView.ItemTemplate>
-            <DataTemplate>
-                <StackLayout 
-                    Orientation="Horizontal"
-                    HorizontalOptions="CenterAndExpand"
-                    VerticalOptions="Start">
-                    <Label 
-                        Text="{Binding Id}"
-                        IsVisible="False"/>
-                    <Label
-                        Text="{Binding Label}"
-                        TextColor="Black" WidthRequest="100"
-                        HorizontalOptions="Start"
-                        VerticalTextAlignment="Center">
-                        <Label.GestureRecognizers>
-                            <TapGestureRecognizer NumberOfTapsRequired="2" Command="TapGestureRecognizer_OnTapped"/>
-                        </Label.GestureRecognizers>
-                    </Label>
-                    <Image 
-                        WidthRequest="30"
-                        HeightRequest="30"
-                        Source="pan"
-                        HorizontalOptions="End"
-                        VerticalOptions="Center"
-                        BackgroundColor="Transparent"
-                        Rotation="{Binding  Pan}">
-                        <Image.GestureRecognizers>
-                            <PanGestureRecognizer PanUpdated="PanGestureRecognizer_OnPanUpdated"></PanGestureRecognizer>
-                        </Image.GestureRecognizers>
-                    </Image>
-                    <Slider 
-                        ThumbColor="Black"
-                        MinimumTrackColor="Black"
-                        BackgroundColor="Transparent"
-                        HorizontalOptions="CenterAndExpand"
-                        VerticalOptions="Center"
-                        WidthRequest="170"
-                        HeightRequest="30"
-                        Maximum="1.2"
-                        Value="{Binding VolumeDouble}"
-                        IsEnabled="{Binding NotMute}"
-                        ValueChanged="Slider_OnValueChanged"/>
-                    <Label
-                        HorizontalOptions="End"
-                        VerticalOptions="Center"          
-                        Text="{Binding VolumeString}"/>                
-                    <Button
-                        WidthRequest="30"
-                        HorizontalOptions="End"
-                        VerticalOptions="Center"
-                        BackgroundColor="Transparent"
-                        ImageSource="{Binding ImageSource}">
-                        <Button.GestureRecognizers>
-                            <TapGestureRecognizer Command="TapGestureRecognizer_MuteButton"/>
-                        </Button.GestureRecognizers>
-                    </Button>
-                </StackLayout>
+            <DataTemplate >  <!-- x:DataType="model:Stream" -->
+                <ViewCell>
+                    <ViewCell.View>
+                        <StackLayout 
+                            Orientation="Horizontal"
+                            HorizontalOptions="CenterAndExpand"
+                            VerticalOptions="Start">
+                            <Label 
+                                Text="{Binding Id}"
+                                IsVisible="False"/>
+                            <Label
+                                Text="{Binding Label}"
+                                TextColor="Black" WidthRequest="100"
+                                HorizontalOptions="Start"
+                                VerticalTextAlignment="Center">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer NumberOfTapsRequired="2"  Command="{Binding LabelTap}" CommandParameter="{Binding Id}"/>
+                                </Label.GestureRecognizers>
+                            </Label>
+                            <!-- <Image -->
+                            <!--     WidthRequest="30" -->
+                            <!--     HeightRequest="30" -->
+                            <!--     Source="pan" -->
+                            <!--     HorizontalOptions="End" -->
+                            <!--     VerticalOptions="Center" -->
+                            <!--     BackgroundColor="Transparent" -->
+                            <!--     Rotation="{Binding  Pan}"> -->
+                            <!--     <Image.GestureRecognizers> -->
+                            <!--         <PanGestureRecognizer PanUpdated="PanGestureRecognizer_OnPanUpdated"></PanGestureRecognizer> -->
+                            <!--     </Image.GestureRecognizers> -->
+                            <!-- </Image> -->
+                            <Slider 
+                                ThumbColor="Black"
+                                MinimumTrackColor="Black"
+                                BackgroundColor="Transparent"
+                                HorizontalOptions="CenterAndExpand"
+                                VerticalOptions="Center"
+                                WidthRequest="170"
+                                HeightRequest="30"
+                                Maximum="1.2"
+                                Value="{Binding VolumeMultiplier}"
+                                IsEnabled="{Binding NotMute}"
+                                ValueChanged="Slider_OnValueChanged"/>
+                            <Label
+                                HorizontalOptions="End"
+                                VerticalOptions="Center"
+                                Text="{Binding Path=VolumeMultiplier, StringFormat='%{0:F02}'}"/>                
+                            <ImageButton
+                                WidthRequest="30"
+                                HeightRequest="30"
+                                HorizontalOptions="End"
+                                VerticalOptions="Center"
+                                BackgroundColor="Transparent"
+                                Source="{Binding ImageSource}"
+                                Clicked="TapGestureRecognizer_MuteButton"/>
+                        </StackLayout>
+                    </ViewCell.View>
+                </ViewCell>
             </DataTemplate>
         </ListView.ItemTemplate>
         <ListView.Footer>
@@ -85,9 +91,9 @@
                     TextType="Html"
                     HorizontalOptions="Start"
                     VerticalOptions="CenterAndExpand">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnChangeBPMStep" />
-                    </Label.GestureRecognizers>
+                    <!-- <Label.GestureRecognizers> -->
+                    <!--     <TapGestureRecognizer Tapped="OnChangeBPMStep" /> -->
+                    <!-- </Label.GestureRecognizers> -->
                 </Label>
                 <Stepper 
                     x:Name="BpmStepper"

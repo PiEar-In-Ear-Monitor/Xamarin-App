@@ -1,16 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:PiEar.Models;assembly=PiEar"
              x:Class="PiEar.Views.Settings">
     <NavigationPage.TitleView>
-        <Slider HeightRequest="44" WidthRequest="300" />
+        <Label Text="Settings"/>
     </NavigationPage.TitleView>
-    <ContentPage.Content>
-        <StackLayout>
-            <Label Text="Hello, world!"
-                   VerticalOptions="CenterAndExpand"
-                   HorizontalOptions="CenterAndExpand" />
-        </StackLayout>
-    </ContentPage.Content>
+    <ListView x:Name="SettingsTest">
+        <ListView.ItemTemplate>
+            <DataTemplate x:DataType="models:Stream">
+                <ViewCell>
+                    <ViewCell.View><StackLayout 
+                    Orientation="Horizontal"
+                    HorizontalOptions="CenterAndExpand"
+                    VerticalOptions="Start">
+                    <Label 
+                        Text="{Binding Id}"
+                        IsVisible="False"/>
+                    <Label
+                        Text="{Binding Label}"
+                        TextColor="Black" WidthRequest="100"
+                        HorizontalOptions="Start"
+                        VerticalTextAlignment="Center">
+                    </Label>
+                    <Image 
+                        WidthRequest="30"
+                        HeightRequest="30"
+                        Source="pan"
+                        HorizontalOptions="End"
+                        VerticalOptions="Center"
+                        BackgroundColor="Transparent"
+                        Rotation="{Binding  Pan}">
+                    </Image>
+                    <Slider 
+                        ThumbColor="Black"
+                        MinimumTrackColor="Black"
+                        BackgroundColor="Transparent"
+                        HorizontalOptions="CenterAndExpand"
+                        VerticalOptions="Center"
+                        WidthRequest="170"
+                        HeightRequest="30"
+                        Maximum="1.2"
+                        Value="{Binding VolumeDouble}"
+                        IsEnabled="{Binding NotMute}"/>
+                    <Label
+                        HorizontalOptions="End"
+                        VerticalOptions="Center"
+                        Text="{Binding Path=VolumeMultiplier, StringFormat='%{0:F02}'}"/>                
+                    <Button
+                        WidthRequest="30"
+                        HorizontalOptions="End"
+                        VerticalOptions="Center"
+                        BackgroundColor="Transparent"
+                        ImageSource="{Binding ImageSource}">
+                    </Button>
+                </StackLayout>
+                    </ViewCell.View>
+                </ViewCell>
+            </DataTemplate>
+        </ListView.ItemTemplate>
+    </ListView>
 </ContentPage>

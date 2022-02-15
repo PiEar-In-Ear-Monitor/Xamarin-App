@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using PiEar.Models;
 using Xamarin.Forms;
@@ -7,34 +8,37 @@ namespace PiEar.Views
 {
     public partial class MainPage
     {
+        private readonly ObservableCollection<Stream> _streams = new ObservableCollection<Stream>();
         public MainPage()
         {
             InitializeComponent();
-            for (int i = 0; i < GlobalVariables.NumberOfStreams; i++)
+        }
+        
+        protected override void OnAppearing()
+        {
+            for (int i = 0; i < 20; i++)
             {
-                GlobalVariables.Streams.Add(new Stream($"Channel {i + 1}"));
-                // SlidersBody.Children.Add(newLayout);
+                _streams.Add(new Stream($"Channel {i + 1}"));
             }
-
-            ListOfChannels.ItemsSource = GlobalVariables.Streams;
+            ListOfChannels.ItemsSource = _streams;
         }
 
-        private async void TapGestureRecognizer_OnTapped(Label sender)
+        private async void TapGestureRecognizer_OnTapped(object sender, EventArgs e)
         {
-            try
-            {
-                string newName = await DisplayPromptAsync("What would you like to name this channel?", "");
-                Debug.Write($"{newName}\n");
-                if (newName.Length > 0)
-                {
-                    sender.Text = ((newName.Length > 26 ) ? newName.Substring(0, 26) : newName );
-                }
-
-            }
-            catch (Exception e)
-            {
-                Debug.Write($"Error: {e}\n");
-            }
+            // try
+            // {
+            //     string newName = await DisplayPromptAsync("What would you like to name this channel?", "");
+            //     Debug.Write($"{newName}\n");
+            //     if (newName.Length > 0)
+            //     {
+            //         sender.Text = ((newName.Length > 26 ) ? newName.Substring(0, 26) : newName );
+            //     }
+            //
+            // }
+            // catch (Exception ex)
+            // {
+            //     Debug.Write($"Error: {ex}\n");
+            // }
         }
 
         private void OnChangeBPM(object sender, ValueChangedEventArgs e)
@@ -73,15 +77,17 @@ namespace PiEar.Views
 
         private void Slider_OnValueChanged(object sender, ValueChangedEventArgs e)
         {
-            throw new NotImplementedException();
+            // throw new NotImplementedException();
         }
 
-        private async void TapGestureRecognizer_MuteButton(Label sender)
+        private void TapGestureRecognizer_MuteButton(object sender, EventArgs e)
         {
-            string index = sender.Parent.LogicalChildren[0].Text;
-            int id = int.Parse(index);
-            Stream toChange = GlobalVariables.Streams[id];
-            toChange.Mute = !toChange.Mute;
+            var imageButton = (ImageButton) sender;
+            Debug.WriteLine(imageButton.BindingContext);
+            // string index = sender.Parent.LogicalChildren[0].Text;
+            // int id = int.Parse(index);
+            // Stream toChange = GlobalVariables.Streams[id];
+            // toChange.Mute = !toChange.Mute;
             // if (sender.IsEnabled)
             // {
             //     toChange.Mute = false;
@@ -97,22 +103,22 @@ namespace PiEar.Views
             // }
         }
 
-        private void PanGestureRecognizer_OnPanUpdated(object sender, PanUpdatedEventArgs e)
-        {
-            
-            if (e.StatusType == GestureStatus.Running)
-            {
-                sender.Rotation += e.TotalX / 2.0;
-            }
-
-            if (sender.Rotation > 130)
-            {
-                sender.Rotation = 130;
-            } else if (sender.Rotation < -130)
-            {
-                sender.Rotation = -130;
-            }
-            Debug.WriteLine($"({e.TotalX}, {e.TotalY})");
-        }
+        // private void PanGestureRecognizer_OnPanUpdated(object sender, PanUpdatedEventArgs e)
+        // {
+        //     Image image = (Image)sender; 
+        //     if (e.StatusType == GestureStatus.Running)
+        //     {
+        //         image.Rotation += e.TotalX / 2.0;
+        //     }
+        //     
+        //     if (image.Rotation > 130)
+        //     {
+        //         image.Rotation = 130;
+        //     } else if (image.Rotation < -130)
+        //     {
+        //         image.Rotation = -130;
+        //     }
+        //     Debug.WriteLine($"({e.TotalX}, {e.TotalY})");
+        // }
     }
 }
