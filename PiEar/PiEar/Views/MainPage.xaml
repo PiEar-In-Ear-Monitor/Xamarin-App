@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:PiEar.ViewModels;assembly=PiEar"
              xmlns:models="clr-namespace:PiEar.Models;assembly=PiEar"
              x:Class="PiEar.Views.MainPage">
     <ContentPage.ToolbarItems>
@@ -24,18 +25,18 @@
                             Orientation="Horizontal"
                             HorizontalOptions="CenterAndExpand"
                             VerticalOptions="Start"
-                            x:DataType="models:Stream">
+                            x:DataType="viewmodels:StreamController">
                             <Label
-                                Text="{Binding Label}"
+                                Text="{Binding Stream.Label}"
                                 TextColor="Black" WidthRequest="100"
                                 HorizontalOptions="Start"
                                 VerticalTextAlignment="Center">
-                                <!-- <Label.GestureRecognizers> -->
-                                <!--     <TapGestureRecognizer -->
-                                <!--         NumberOfTapsRequired="2" -->
-                                <!--         Command="{Binding LabelTap}"/> -->
-                                <!--         ~1~ CommandParameter="{Binding Id}"/> @1@ -->
-                                <!-- </Label.GestureRecognizers> -->
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        NumberOfTapsRequired="2"
+                                        Command="{Binding LabelTap}"
+                                        CommandParameter="{Binding Id}"/>
+                                </Label.GestureRecognizers>
                             </Label>
                             <!-- <Image -->
                             <!--     WidthRequest="30" -->
@@ -58,32 +59,32 @@
                                 WidthRequest="170"
                                 HeightRequest="30"
                                 Maximum="1.2"
-                                Value="{Binding VolumeMultiplier}"
+                                Value="{Binding Stream.VolumeMultiplier}"
                                 IsEnabled="{Binding NotMute}"/>
                             <Label
                                 HorizontalOptions="End"
                                 VerticalOptions="Center"
-                                Text="{Binding Path=VolumeMultiplier, StringFormat='{0:F02}%'}"/>                
-                            <ImageButton
+                                Text="{Binding Path=Stream.VolumeMultiplier, StringFormat='{0:F02}%'}"/>                
+                            <Image
                                 WidthRequest="30"
                                 HeightRequest="30"
                                 HorizontalOptions="End"
                                 VerticalOptions="Center"
                                 BackgroundColor="Transparent"
                                 Source="{Binding ImageSource}">
-                                <!-- <ImageButton.GestureRecognizers> -->
-                                <!--     <TapGestureRecognizer  -->
-                                <!--         NumberOfTapsRequired="2" -->
-                                <!--         Command="{Binding ImageTap}" -->
-                                <!--         CommandParameter="{Binding Id}"/> -->
-                                <!-- </ImageButton.GestureRecognizers> -->
-                            </ImageButton>
+                                <Image.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        NumberOfTapsRequired="2"
+                                        Command="{Binding ImageTap}"
+                                        CommandParameter="{Binding Stream}"/>
+                                </Image.GestureRecognizers>
+                            </Image>
                         </StackLayout>
                     </ViewCell.View>
                 </ViewCell>
             </DataTemplate>
         </ListView.ItemTemplate>
-        <ListView.Footer>
+        <ListView.Header>
             <StackLayout
                 Orientation="Horizontal"
                 x:DataType="models:Click">
@@ -93,7 +94,6 @@
                     HeightRequest="60"
                     WidthRequest="60"/>
                 <Label
-                    x:Name="StepperStepCount"
                     Text="+10 &#10132; +5"
                     TextType="Html"
                     HorizontalOptions="Start"
@@ -116,7 +116,7 @@
                     VerticalOptions="Center"
                     HorizontalOptions="End"/>
             </StackLayout>
-        </ListView.Footer>
+        </ListView.Header>
     </ListView>
 
 </ContentPage>

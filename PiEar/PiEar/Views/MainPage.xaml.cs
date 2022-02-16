@@ -8,7 +8,7 @@ namespace PiEar.Views
 {
     public partial class MainPage
     {
-        private readonly ObservableCollection<Stream> _streams = new ObservableCollection<Stream>();
+        public readonly ObservableCollection<Stream> Streams = new ObservableCollection<Stream>();
         public MainPage()
         {
             InitializeComponent();
@@ -18,9 +18,9 @@ namespace PiEar.Views
         {
             for (int i = 0; i < 20; i++)
             {
-                _streams.Add(new Stream($"Channel {i + 1}"));
+                Streams.Add(new Stream($"Channel {i + 1}"));
             }
-            ListOfChannels.ItemsSource = _streams;
+            ListOfChannels.ItemsSource = Streams;
         }
 
         private async void TapGestureRecognizer_OnTapped(object sender, EventArgs e)
@@ -46,24 +46,24 @@ namespace PiEar.Views
             CountBpm.Text = $"BPM {e.NewValue:F0}";
         }
         
-        private void OnChangeBPMStep(object sender, EventArgs e)
-        {
-            switch (StepperStepCount.Text)
-            {
-                case "+1 &#10132; +10":
-                    BpmStepper.Increment = 10;
-                    StepperStepCount.Text = "+10 &#10132; +5";
-                    break;
-                case "+10 &#10132; +5":
-                    BpmStepper.Increment = 5;
-                    StepperStepCount.Text = "+5 &#10132; +1";
-                    break;
-                default:
-                    BpmStepper.Increment = 1;
-                    StepperStepCount.Text = "+1 &#10132; +10";
-                    break;
-            }
-        }
+        // private void OnChangeBPMStep(object sender, EventArgs e)
+        // {
+        //     switch (StepperStepCount.Text)
+        //     {
+        //         case "+1 &#10132; +10":
+        //             BpmStepper.Increment = 10;
+        //             StepperStepCount.Text = "+10 &#10132; +5";
+        //             break;
+        //         case "+10 &#10132; +5":
+        //             BpmStepper.Increment = 5;
+        //             StepperStepCount.Text = "+5 &#10132; +1";
+        //             break;
+        //         default:
+        //             BpmStepper.Increment = 1;
+        //             StepperStepCount.Text = "+1 &#10132; +10";
+        //             break;
+        //     }
+        // }
 
         private async void OpenSettings(object sender, EventArgs e)
         {
@@ -74,35 +74,7 @@ namespace PiEar.Views
         {
             await this.Navigation.PushAsync(new About());
         }
-
-        private void Slider_OnValueChanged(object sender, ValueChangedEventArgs e)
-        {
-            // throw new NotImplementedException();
-        }
-
-        private void TapGestureRecognizer_MuteButton(object sender, EventArgs e)
-        {
-            var imageButton = (ImageButton) sender;
-            Debug.WriteLine(imageButton.BindingContext);
-            // string index = sender.Parent.LogicalChildren[0].Text;
-            // int id = int.Parse(index);
-            // Stream toChange = GlobalVariables.Streams[id];
-            // toChange.Mute = !toChange.Mute;
-            // if (sender.IsEnabled)
-            // {
-            //     toChange.Mute = false;
-            //     "mute"
-            //     channelSlider.IsEnabled = false;
-            //     channelVolume.TextDecorations = TextDecorations.Strikethrough;
-            // }
-            // else
-            // {
-            //     channelMute.Source = "unmute";
-            //     channelSlider.IsEnabled = true;
-            //     channelVolume.TextDecorations = TextDecorations.None;
-            // }
-        }
-
+        
         // private void PanGestureRecognizer_OnPanUpdated(object sender, PanUpdatedEventArgs e)
         // {
         //     Image image = (Image)sender; 
