@@ -15,15 +15,6 @@ namespace PiEar.Views
 
         protected override void OnAppearing()
         {
-            var testList = new ObservableCollection<Stream>();
-            testList.Add(new Stream("Hello"));
-            testList.Add(new Stream("World"));
-            Debug.WriteLine(testList.GetType());
-            SettingsTest.ItemsSource = testList;
-            
-            testList.Add(new Stream("This"));
-            testList.Add(new Stream("Is"));
-            testList.Add(new Stream("Text"));
         }
 
     }

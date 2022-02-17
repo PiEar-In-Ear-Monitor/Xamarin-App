@@ -2,7 +2,13 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:PiEar.ViewModels;assembly=PiEar"
+             xmlns:models="clr-namespace:PiEar.Models;assembly=PiEar"
              x:Class="PiEar.Views.MainPage">
+    <ContentPage.Resources>
+        <models:BoolConverter x:Key="CustomBoolConverter" />
+        <models:ImageConverter x:Key="CustomImageConverter" />
+        <models:VolumeConverter x:Key="CustomVolumeConverter" />
+    </ContentPage.Resources>
     <ContentPage.ToolbarItems>
         <ToolbarItem
             IconImageSource="icon"
@@ -43,8 +49,7 @@
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer
                                             NumberOfTapsRequired="2"
-                                            Command="{Binding LabelTap}"
-                                            CommandParameter="{Binding Stream}"/>
+                                            Command="{Binding LabelTap}"/>
                                     </Label.GestureRecognizers>
                                 </Label>
                                 <!-- <Image -->
@@ -69,23 +74,21 @@
                                     HeightRequest="30"
                                     Maximum="1.2"
                                     Value="{Binding Stream.VolumeMultiplier}"
-                                    IsEnabled="{Binding NotMute}"/>
+                                    IsEnabled="{Binding Stream.Mute, Converter={StaticResource CustomBoolConverter}}"/>
                                 <Label
                                     HorizontalOptions="End"
                                     VerticalOptions="CenterAndExpand"
-                                    Text="{Binding Path=Stream.VolumeMultiplier, StringFormat='{0:F02}%'}"/>                
+                                    Text="{Binding Path=Stream.VolumeMultiplier, Converter={StaticResource CustomVolumeConverter}, StringFormat='{0:##0}%'}"/>                
                                 <Image
                                     WidthRequest="30"
                                     HeightRequest="30"
                                     HorizontalOptions="End"
                                     VerticalOptions="Center"
                                     BackgroundColor="Transparent"
-                                    Source="{Binding ImageSource}">
+                                    Source="{Binding Stream.Mute, Converter={StaticResource CustomImageConverter}}">
                                     <Image.GestureRecognizers>
                                         <TapGestureRecognizer
-                                            NumberOfTapsRequired="2"
-                                            Command="{Binding ImageTap}"
-                                            CommandParameter="{Binding Stream}"/>
+                                            Command="{Binding ImageTap}"/>
                                     </Image.GestureRecognizers>
                                 </Image>
                             </StackLayout>
@@ -103,15 +106,14 @@
                 HorizontalOptions="Start"
                 HeightRequest="60"
                 WidthRequest="60"
-                IsEnabled="{Binding Click.Enabled}"/>
+                IsEnabled="{Binding Click.Enabled, Mode=TwoWay}"/>
             <Label
                 HorizontalOptions="Start"
                 VerticalOptions="Center"
                 Text="{Binding Click.StepCount, StringFormat='Step Size: {0}'}">
                 <Label.GestureRecognizers>
                     <TapGestureRecognizer
-                        Command="{Binding StepperTap}"
-                        CommandParameter="{Binding Click}"/>
+                        Command="{Binding StepperTap}"/>
                 </Label.GestureRecognizers>
             </Label>
             <Stepper
@@ -124,7 +126,12 @@
             <Label
                 VerticalOptions="Center"
                 HorizontalOptions="End"
-                Text="{Binding Click.Bpm, StringFormat='BPM {0}'}"/>
+                Text="{Binding Click.Bpm, StringFormat='BPM {0}'}">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer
+                        Command="{Binding ChangeBpm}"/>
+                </Label.GestureRecognizers>
+            </Label>
         </StackLayout>
     </Grid>
 </ContentPage>

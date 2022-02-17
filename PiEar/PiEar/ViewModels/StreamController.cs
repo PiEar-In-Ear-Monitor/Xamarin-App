@@ -13,36 +13,34 @@ namespace PiEar.ViewModels
     {
         public StreamController(string label)
         {
+            LabelTap = new Command(_labelTap);
+            ImageTap = new Command(_imageTap);
             Stream.Label = label;
         }
         public Stream Stream { get; } = new Stream();
-        public string ImageSource => (Stream.Mute) ? "mute" : "unmute";
-        public bool NotMute => !Stream.Mute;
         public double VolumeDouble => Math.Pow(2, (3 * Stream.VolumeMultiplier)) + 1;
 
         // Commands to bind to
-        public ICommand LabelTap { get; } = new Command(_labelTap);
-        public ICommand ImageTap { get; } = new Command(_imageTap);
+        public ICommand LabelTap { get; }
+        public ICommand ImageTap { get; }
         
-        private static async void _labelTap (object stream) 
+        private async void _labelTap () 
         {
             
             try
             {
                 string newLabel = await Application.Current.MainPage.DisplayPromptAsync("What would you like to name this channel?", "");
                 if (newLabel.Length <= 0) return;
-                ((Stream)stream).Label = ((newLabel.Length > 26 ) ? newLabel.Substring(0, 26) : newLabel );
-                Debug.WriteLine ($"LabelTap: Label now {((Stream)stream).Label} at ID {((Stream)stream).Id}");
+                Stream.Label = ((newLabel.Length > 26 ) ? newLabel.Substring(0, 26) : newLabel );
             }
             catch (Exception ex)
             {
                 Debug.Write($"Error: {ex}\n");
             }
         }
-        private static void _imageTap (object stream)
+        private void _imageTap ()
         {
-            ((Stream) stream).Mute = !((Stream) stream).Mute;
-            Debug.WriteLine($"ImageTap: Mute now {((Stream) stream).Mute} at ID {((Stream) stream).Id}");
+            Stream.Mute = !Stream.Mute;
         }
         // REQUIRED STUFF
         public event PropertyChangedEventHandler PropertyChanged;

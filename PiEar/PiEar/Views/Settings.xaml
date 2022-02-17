@@ -6,55 +6,5 @@
     <NavigationPage.TitleView>
         <Label Text="Settings"/>
     </NavigationPage.TitleView>
-    <ListView x:Name="SettingsTest">
-        <ListView.ItemTemplate>
-            <DataTemplate x:DataType="viewModels:StreamController">
-                <ViewCell>
-                    <ViewCell.View><StackLayout 
-                    Orientation="Horizontal"
-                    HorizontalOptions="CenterAndExpand"
-                    VerticalOptions="Start">
-                    <Label
-                        Text="{Binding Stream.Label}"
-                        TextColor="Black" WidthRequest="100"
-                        HorizontalOptions="Start"
-                        VerticalTextAlignment="Center">
-                    </Label>
-                    <Image 
-                        WidthRequest="30"
-                        HeightRequest="30"
-                        Source="pan"
-                        HorizontalOptions="End"
-                        VerticalOptions="Center"
-                        BackgroundColor="Transparent"
-                        Rotation="{Binding  Stream.Pan}">
-                    </Image>
-                    <Slider 
-                        ThumbColor="Black"
-                        MinimumTrackColor="Black"
-                        BackgroundColor="Transparent"
-                        HorizontalOptions="CenterAndExpand"
-                        VerticalOptions="Center"
-                        WidthRequest="170"
-                        HeightRequest="30"
-                        Maximum="1.2"
-                        Value="{Binding VolumeDouble}"
-                        IsEnabled="{Binding NotMute}"/>
-                    <Label
-                        HorizontalOptions="End"
-                        VerticalOptions="Center"
-                        Text="{Binding Path=Stream.VolumeMultiplier, StringFormat='%{0:F02}'}"/>                
-                    <Button
-                        WidthRequest="30"
-                        HorizontalOptions="End"
-                        VerticalOptions="Center"
-                        BackgroundColor="Transparent"
-                        ImageSource="{Binding ImageSource}">
-                    </Button>
-                </StackLayout>
-                    </ViewCell.View>
-                </ViewCell>
-            </DataTemplate>
-        </ListView.ItemTemplate>
-    </ListView>
+    <Label Text="Hello World"/>
 </ContentPage>

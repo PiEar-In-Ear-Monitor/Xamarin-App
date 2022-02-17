@@ -6,15 +6,49 @@ namespace PiEar.Models
 {
     public class Stream : INotifyPropertyChanged
     {
-        // TESTING
+        private static int _count = 0;
+        public string Id { get; } = _count++.ToString();
+        private string _label;
+        private bool _mute;
+        private double _pan;
         private double _volumeMultiplier;
-        
-        public static int Count = 0;
-        public string Id { get; } = Count++.ToString();
-        public string Label { get; set; } = $"Channel {Count + 1}";
-        public bool Mute { get; set; } = false;
-        public double Pan { get; set; } = 0;
-
+        public string Label 
+        {
+            get
+            {
+                return _label;
+            }
+            set
+            {
+                _label = value;
+                OnPropertyChanged();
+            }
+            
+        }
+        public bool Mute
+        {
+            get
+            {
+                return _mute;
+            }
+            set
+            {
+                _mute = value;
+                OnPropertyChanged();
+            }
+        }
+        public double Pan
+        {
+            get
+            {
+                return _pan;
+            }
+            set
+            {
+                _pan = value;
+                OnPropertyChanged();
+            }
+        }
         public double VolumeMultiplier
         {
             get
@@ -27,10 +61,21 @@ namespace PiEar.Models
                 OnPropertyChanged();
             }
         }
-        public Stream(string label) { Label = label; }
-        public Stream() {}
+        public Stream(string label)
+        {
+            _label = label;
+            _mute =false;
+            _pan = 0.0;
+            _volumeMultiplier = 0.0;
+        }
+        public Stream()
+        {
+            _label = $"Channel {_count + 1}";
+            _mute =false;
+            _pan = 0.0;
+            _volumeMultiplier = 0.0;
+        }
         public event PropertyChangedEventHandler PropertyChanged;
-
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

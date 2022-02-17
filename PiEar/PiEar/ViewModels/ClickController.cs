@@ -11,35 +11,46 @@ namespace PiEar.ViewModels
 {
     public class ClickController: INotifyPropertyChanged
     {
-        public ClickController(){}
         public Click Click { get; } = new Click();
-        public string ImageSource => (Click.Mute) ? "mute" : "unmute";
-        public bool NotMute => !Click.Mute;
         public double VolumeDouble => Math.Pow(2, (3 * Click.VolumeMultiplier)) + 1;
+        public ClickController()
+        {
+            ChangeBpm = new Command(_changeBpm);
+            StepperTap = new Command(_stepperTap);
+        }
 
         // Commands to bind to
-        public ICommand ImageTap { get; } = new Command(_imageTap);
-        public ICommand StepperTap { get; } = new Command(_stepperTap);
-        private static void _imageTap (object click)
+        public ICommand StepperTap { get; }
+        public ICommand ChangeBpm { get; }
+        private void _stepperTap ()
         {
-            ((Click) click).Mute = !((Click) click).Mute;
-            Debug.WriteLine($"ImageTap: Mute now {((Click) click).Mute}");
-        }
-        private static void _stepperTap (object click)
-        {
-            switch (((Click) click).StepCount)
+            switch (Click.StepCount)
             {
                 case 10:
-                    ((Click) click).StepCount = 5;
+                    Click.StepCount = 5;
                     break;
                 case 5:
-                    ((Click) click).StepCount = 1;
+                    Click.StepCount = 1;
                     break;
                 case 1:
-                    ((Click) click).StepCount = 10;
+                    Click.StepCount = 10;
                     break;
             }
-            Debug.WriteLine($"StepperTap: Step now {((Click) click).StepCount}");
+        }
+
+        private async void _changeBpm(object click)
+        {
+            string newBpm = await Application.Current.MainPage.DisplayPromptAsync("What is the BPM?", "");
+            try
+            {
+                int intBpm = int.Parse(newBpm);
+                Click.Bpm = intBpm;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+            }
+
         }
         // REQUIRED STUFF
         public event PropertyChangedEventHandler PropertyChanged;
