@@ -33,13 +33,13 @@
                             <StackLayout 
                                 Orientation="Horizontal"
                                 HorizontalOptions="CenterAndExpand"
-                                VerticalOptions="Start"
+                                VerticalOptions="CenterAndExpand"
                                 x:DataType="viewmodels:StreamController">
                                 <Label
-                                    Text="{Binding Stream.Label}"
                                     TextColor="Black" WidthRequest="100"
                                     HorizontalOptions="Start"
-                                    VerticalTextAlignment="Center">
+                                    VerticalTextAlignment="Center"
+                                    Text="{Binding Stream.Label}">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer
                                             NumberOfTapsRequired="2"
@@ -72,7 +72,7 @@
                                     IsEnabled="{Binding NotMute}"/>
                                 <Label
                                     HorizontalOptions="End"
-                                    VerticalOptions="Center"
+                                    VerticalOptions="CenterAndExpand"
                                     Text="{Binding Path=Stream.VolumeMultiplier, StringFormat='{0:F02}%'}"/>                
                                 <Image
                                     WidthRequest="30"
@@ -97,38 +97,34 @@
         <StackLayout
             Grid.Row="1"
             Orientation="Horizontal"
-            x:DataType="viewmodels:ClickController"
-            x:Name="BpmStackLayout">
-            <!-- <BindableLayout.ItemTemplate> -->
-            <!--     <DataTemplate> -->
-                    <Switch
-                        VerticalOptions="Center"
-                        HorizontalOptions="Start"
-                        HeightRequest="60"
-                        WidthRequest="60"
-                        IsEnabled="{Binding Click.Enabled}"/>
-                    <Label
-                        Text="{Binding Click.StepCount}"
-                        HorizontalOptions="Start"
-                        VerticalOptions="CenterAndExpand">
-                        <Label.GestureRecognizers>
-                            <TapGestureRecognizer
-                                Command="{Binding StepperTap}"
-                                CommandParameter="{Binding Click}"/>
-                        </Label.GestureRecognizers>
-                    </Label>
-                    <Stepper
-                        VerticalOptions="Center"
-                        HorizontalOptions="Center"
-                        Maximum = "200"
-                        Value="{Binding Click.Bpm}"
-                        Increment="{Binding Click.StepCount}"/>
-                    <Label
-                        Text="{Binding Click.Bpm, StringFormat='BPM {0}'}"
-                        VerticalOptions="Center"
-                        HorizontalOptions="End"/>
-            <!--     </DataTemplate> -->
-            <!-- </BindableLayout.ItemTemplate> -->
+            x:DataType="viewmodels:ClickController">
+            <Switch
+                VerticalOptions="Center"
+                HorizontalOptions="Start"
+                HeightRequest="60"
+                WidthRequest="60"
+                IsEnabled="{Binding Click.Enabled}"/>
+            <Label
+                HorizontalOptions="Start"
+                VerticalOptions="Center"
+                Text="{Binding Click.StepCount, StringFormat='Step Size: {0}'}">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer
+                        Command="{Binding StepperTap}"
+                        CommandParameter="{Binding Click}"/>
+                </Label.GestureRecognizers>
+            </Label>
+            <Stepper
+                VerticalOptions="Center"
+                HorizontalOptions="Center"
+                Maximum = "200"
+                ScaleX="0.75"
+                Value="{Binding Click.Bpm}"
+                Increment="{Binding Click.StepCount}"/>
+            <Label
+                VerticalOptions="Center"
+                HorizontalOptions="End"
+                Text="{Binding Click.Bpm, StringFormat='BPM {0}'}"/>
         </StackLayout>
     </Grid>
 </ContentPage>

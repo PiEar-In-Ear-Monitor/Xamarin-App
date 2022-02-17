@@ -19,6 +19,7 @@ namespace PiEar.Views
                 _streams.Add(new StreamController($"Channel {i + 1}"));
             }
             ListOfChannels.ItemsSource = _streams;
+            _clickController.Click.Bpm = 140;
             BindingContext = _clickController;
         }
         private async void OpenSettings(object sender, EventArgs e)
