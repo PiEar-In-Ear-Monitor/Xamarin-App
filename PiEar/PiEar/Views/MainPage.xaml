@@ -99,8 +99,8 @@
             Orientation="Horizontal"
             x:DataType="viewmodels:ClickController"
             x:Name="BpmStackLayout">
-            <BindableLayout.ItemTemplate>
-                <DataTemplate>
+            <!-- <BindableLayout.ItemTemplate> -->
+            <!--     <DataTemplate> -->
                     <Switch
                         VerticalOptions="Center"
                         HorizontalOptions="Start"
@@ -127,8 +127,8 @@
                         Text="{Binding Click.Bpm, StringFormat='BPM {0}'}"
                         VerticalOptions="Center"
                         HorizontalOptions="End"/>
-                </DataTemplate>
-            </BindableLayout.ItemTemplate>
+            <!--     </DataTemplate> -->
+            <!-- </BindableLayout.ItemTemplate> -->
         </StackLayout>
     </Grid>
 </ContentPage>
