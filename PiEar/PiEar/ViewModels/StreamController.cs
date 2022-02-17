@@ -15,7 +15,7 @@ namespace PiEar.ViewModels
         {
             Stream.Label = label;
         }
-        public Stream Stream { get; set; } = new Stream();
+        public Stream Stream { get; } = new Stream();
         public string ImageSource => (Stream.Mute) ? "mute" : "unmute";
         public bool NotMute => !Stream.Mute;
         public double VolumeDouble => Math.Pow(2, (3 * Stream.VolumeMultiplier)) + 1;

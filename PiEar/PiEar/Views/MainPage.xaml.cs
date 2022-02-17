@@ -11,16 +11,15 @@ namespace PiEar.Views
         public MainPage()
         {
             InitializeComponent();
-        }
-        protected override void OnAppearing()
-        {
             for (int i = 0; i < 20; i++)
             {
                 _streams.Add(new StreamController($"Channel {i + 1}"));
+                ListOfChannels.ItemsSource = _streams;
+                BindingContext = _clickController;
             }
-            ListOfChannels.ItemsSource = _streams;
-            _clickController.Click.Bpm = 140;
-            BindingContext = _clickController;
+        }
+        protected override void OnAppearing()
+        {
         }
         private async void OpenSettings(object sender, EventArgs e)
         {
