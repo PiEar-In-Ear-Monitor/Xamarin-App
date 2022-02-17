@@ -3,6 +3,7 @@ namespace PiEar.Models
     public class Stream
     {
         public static int Count = 0;
+        public string Id { get; } = Count++.ToString();
         public string Label { get; set; } = $"Channel {Count + 1}";
         public bool Mute { get; set; } = false;
         public double Pan { get; set; } = 0;

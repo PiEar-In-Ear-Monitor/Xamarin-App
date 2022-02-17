@@ -1,4 +1,6 @@
-﻿using PiEar.Views;
+﻿using System.Collections.ObjectModel;
+using PiEar.ViewModels;
+using PiEar.Views;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -6,10 +8,6 @@ using Xamarin.Forms.Xaml;
 
 namespace PiEar
 {
-    public static class Global
-    {
-        
-    }
     public partial class App
     {
         public App()

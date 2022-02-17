@@ -14,9 +14,6 @@
                     Orientation="Horizontal"
                     HorizontalOptions="CenterAndExpand"
                     VerticalOptions="Start">
-                    <Label 
-                        Text="{Binding Id}"
-                        IsVisible="False"/>
                     <Label
                         Text="{Binding Stream.Label}"
                         TextColor="Black" WidthRequest="100"

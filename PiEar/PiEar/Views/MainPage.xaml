@@ -2,7 +2,6 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:PiEar.ViewModels;assembly=PiEar"
-             xmlns:models="clr-namespace:PiEar.Models;assembly=PiEar"
              x:Class="PiEar.Views.MainPage">
     <ContentPage.ToolbarItems>
         <ToolbarItem
@@ -14,109 +13,122 @@
             Clicked="OpenAbout"
         />
     </ContentPage.ToolbarItems>
-    <ListView 
-        x:Name="ListOfChannels"
-        SelectionMode="None">
-        <ListView.ItemTemplate>
-            <DataTemplate>
-                <ViewCell>
-                    <ViewCell.View>
-                        <StackLayout 
-                            Orientation="Horizontal"
-                            HorizontalOptions="CenterAndExpand"
-                            VerticalOptions="Start"
-                            x:DataType="viewmodels:StreamController">
-                            <Label
-                                Text="{Binding Stream.Label}"
-                                TextColor="Black" WidthRequest="100"
-                                HorizontalOptions="Start"
-                                VerticalTextAlignment="Center">
-                                <Label.GestureRecognizers>
-                                    <TapGestureRecognizer
-                                        NumberOfTapsRequired="2"
-                                        Command="{Binding LabelTap}"
-                                        CommandParameter="{Binding Id}"/>
-                                </Label.GestureRecognizers>
-                            </Label>
-                            <!-- <Image -->
-                            <!--     WidthRequest="30" -->
-                            <!--     HeightRequest="30" -->
-                            <!--     Source="pan" -->
-                            <!--     HorizontalOptions="End" -->
-                            <!--     VerticalOptions="Center" -->
-                            <!--     BackgroundColor="Transparent" -->
-                            <!--     Rotation="{Binding  Pan}"> -->
-                            <!--     <Image.GestureRecognizers> -->
-                            <!--         <PanGestureRecognizer PanUpdated="PanGestureRecognizer_OnPanUpdated"></PanGestureRecognizer> -->
-                            <!--     </Image.GestureRecognizers> -->
-                            <!-- </Image> -->
-                            <Slider 
-                                ThumbColor="Black"
-                                MinimumTrackColor="Black"
-                                BackgroundColor="Transparent"
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="60"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <ListView
+            Grid.Row="0"
+            Grid.Column="0"
+            x:Name="ListOfChannels"
+            SelectionMode="None">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <ViewCell.View>
+                            <StackLayout 
+                                Orientation="Horizontal"
                                 HorizontalOptions="CenterAndExpand"
-                                VerticalOptions="Center"
-                                WidthRequest="170"
-                                HeightRequest="30"
-                                Maximum="1.2"
-                                Value="{Binding Stream.VolumeMultiplier}"
-                                IsEnabled="{Binding NotMute}"/>
-                            <Label
-                                HorizontalOptions="End"
-                                VerticalOptions="Center"
-                                Text="{Binding Path=Stream.VolumeMultiplier, StringFormat='{0:F02}%'}"/>                
-                            <Image
-                                WidthRequest="30"
-                                HeightRequest="30"
-                                HorizontalOptions="End"
-                                VerticalOptions="Center"
-                                BackgroundColor="Transparent"
-                                Source="{Binding ImageSource}">
-                                <Image.GestureRecognizers>
-                                    <TapGestureRecognizer
-                                        NumberOfTapsRequired="2"
-                                        Command="{Binding ImageTap}"
-                                        CommandParameter="{Binding Stream}"/>
-                                </Image.GestureRecognizers>
-                            </Image>
-                        </StackLayout>
-                    </ViewCell.View>
-                </ViewCell>
-            </DataTemplate>
-        </ListView.ItemTemplate>
-        <ListView.Header>
-            <StackLayout
-                Orientation="Horizontal"
-                x:DataType="models:Click">
-                <Switch 
-                    VerticalOptions="Center"
-                    HorizontalOptions="Start"
-                    HeightRequest="60"
-                    WidthRequest="60"/>
-                <Label
-                    Text="+10 &#10132; +5"
-                    TextType="Html"
-                    HorizontalOptions="Start"
-                    VerticalOptions="CenterAndExpand">
-                    <!-- <Label.GestureRecognizers> -->
-                    <!--     <TapGestureRecognizer Tapped="OnChangeBPMStep" /> -->
-                    <!-- </Label.GestureRecognizers> -->
-                </Label>
-                <Stepper 
-                    x:Name="BpmStepper"
-                    VerticalOptions="Center"
-                    HorizontalOptions="Center"
-                    Maximum = "200"
-                    Value="100"
-                    Increment = "10"
-                    ValueChanged="OnChangeBPM"/>
-                <Label 
-                    x:Name="CountBpm"
-                    Text="BPM 100" 
-                    VerticalOptions="Center"
-                    HorizontalOptions="End"/>
-            </StackLayout>
-        </ListView.Header>
-    </ListView>
-
+                                VerticalOptions="Start"
+                                x:DataType="viewmodels:StreamController">
+                                <Label
+                                    Text="{Binding Stream.Label}"
+                                    TextColor="Black" WidthRequest="100"
+                                    HorizontalOptions="Start"
+                                    VerticalTextAlignment="Center">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            NumberOfTapsRequired="2"
+                                            Command="{Binding LabelTap}"
+                                            CommandParameter="{Binding Stream}"/>
+                                    </Label.GestureRecognizers>
+                                </Label>
+                                <!-- <Image -->
+                                <!--     WidthRequest="30" -->
+                                <!--     HeightRequest="30" -->
+                                <!--     Source="pan" -->
+                                <!--     HorizontalOptions="End" -->
+                                <!--     VerticalOptions="Center" -->
+                                <!--     BackgroundColor="Transparent" -->
+                                <!--     Rotation="{Binding  Pan}"> -->
+                                <!--     <Image.GestureRecognizers> -->
+                                <!--         <PanGestureRecognizer PanUpdated="PanGestureRecognizer_OnPanUpdated"></PanGestureRecognizer> -->
+                                <!--     </Image.GestureRecognizers> -->
+                                <!-- </Image> -->
+                                <Slider 
+                                    ThumbColor="Black"
+                                    MinimumTrackColor="Black"
+                                    BackgroundColor="Transparent"
+                                    HorizontalOptions="CenterAndExpand"
+                                    VerticalOptions="Center"
+                                    WidthRequest="170"
+                                    HeightRequest="30"
+                                    Maximum="1.2"
+                                    Value="{Binding Stream.VolumeMultiplier}"
+                                    IsEnabled="{Binding NotMute}"/>
+                                <Label
+                                    HorizontalOptions="End"
+                                    VerticalOptions="Center"
+                                    Text="{Binding Path=Stream.VolumeMultiplier, StringFormat='{0:F02}%'}"/>                
+                                <Image
+                                    WidthRequest="30"
+                                    HeightRequest="30"
+                                    HorizontalOptions="End"
+                                    VerticalOptions="Center"
+                                    BackgroundColor="Transparent"
+                                    Source="{Binding ImageSource}">
+                                    <Image.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            NumberOfTapsRequired="2"
+                                            Command="{Binding ImageTap}"
+                                            CommandParameter="{Binding Stream}"/>
+                                    </Image.GestureRecognizers>
+                                </Image>
+                            </StackLayout>
+                        </ViewCell.View>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <StackLayout
+            Grid.Row="1"
+            Orientation="Horizontal"
+            x:DataType="viewmodels:ClickController"
+            x:Name="BpmStackLayout">
+            <BindableLayout.ItemTemplate>
+                <DataTemplate>
+                    <Switch
+                        VerticalOptions="Center"
+                        HorizontalOptions="Start"
+                        HeightRequest="60"
+                        WidthRequest="60"
+                        IsEnabled="{Binding Click.Enabled}"/>
+                    <Label
+                        Text="{Binding Click.StepCount}"
+                        HorizontalOptions="Start"
+                        VerticalOptions="CenterAndExpand">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer
+                                Command="{Binding StepperTap}"
+                                CommandParameter="{Binding Click}"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <Stepper
+                        VerticalOptions="Center"
+                        HorizontalOptions="Center"
+                        Maximum = "200"
+                        Value="{Binding Click.Bpm}"
+                        Increment="{Binding Click.StepCount}"/>
+                    <Label
+                        Text="{Binding Click.Bpm, StringFormat='BPM {0}'}"
+                        VerticalOptions="Center"
+                        HorizontalOptions="End"/>
+                </DataTemplate>
+            </BindableLayout.ItemTemplate>
+        </StackLayout>
+    </Grid>
 </ContentPage>
