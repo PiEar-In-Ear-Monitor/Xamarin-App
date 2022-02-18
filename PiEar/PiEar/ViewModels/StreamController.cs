@@ -9,7 +9,7 @@ using Xamarin.Forms;
 
 namespace PiEar.ViewModels
 {
-    public class StreamController: INotifyPropertyChanged
+    public sealed class StreamController: INotifyPropertyChanged
     {
         public StreamController(string label)
         {
@@ -45,7 +45,7 @@ namespace PiEar.ViewModels
         // REQUIRED STUFF
         public event PropertyChangedEventHandler PropertyChanged;
         [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

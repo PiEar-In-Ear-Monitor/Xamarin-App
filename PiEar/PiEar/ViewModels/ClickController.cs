@@ -9,7 +9,7 @@ using Xamarin.Forms;
 
 namespace PiEar.ViewModels
 {
-    public class ClickController: INotifyPropertyChanged
+    public sealed class ClickController: INotifyPropertyChanged
     {
         private double _rotation = -130;
         public Click Click { get; } = new Click();
@@ -25,8 +25,7 @@ namespace PiEar.ViewModels
             set
             {
                 _rotation = value;
-                Click.VolumeMultiplier = (_rotation / 260) * 1.2;
-                Debug.WriteLine(Click.VolumeMultiplier);
+                Click.VolumeMultiplier = ((_rotation / 260) * 1.2) + 0.6;
                 OnPropertyChanged();
             }
         }
@@ -66,7 +65,7 @@ namespace PiEar.ViewModels
         // REQUIRED STUFF
         public event PropertyChangedEventHandler PropertyChanged;
         [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
