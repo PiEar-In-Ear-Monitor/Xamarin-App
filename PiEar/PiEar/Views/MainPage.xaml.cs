@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using PiEar.ViewModels;
+using Xamarin.Forms;
 
 namespace PiEar.Views
 {
@@ -29,22 +30,20 @@ namespace PiEar.Views
         {
             await this.Navigation.PushAsync(new About());
         }
-        // private void PanGestureRecognizer_OnPanUpdated(object sender, PanUpdatedEventArgs e)
-        // {
-        //     Image image = (Image)sender; 
-        //     if (e.StatusType == GestureStatus.Running)
-        //     {
-        //         image.Rotation += e.TotalX / 2.0;
-        //     }
-        //     
-        //     if (image.Rotation > 130)
-        //     {
-        //         image.Rotation = 130;
-        //     } else if (image.Rotation < -130)
-        //     {
-        //         image.Rotation = -130;
-        //     }
-        //     Debug.WriteLine($"({e.TotalX}, {e.TotalY})");
-        // }
+        private void PanGestureRecognizer_OnPanUpdated(object sender, PanUpdatedEventArgs e)
+        {
+            Image image = (Image)sender; 
+            if (e.StatusType == GestureStatus.Running)
+            {
+                _clickController.Rotation += e.TotalX / 2.0;
+            }
+            if (_clickController.Rotation > 130)
+            {
+                _clickController.Rotation = 130;
+            } else if (_clickController.Rotation < -130)
+            {
+                _clickController.Rotation = -130;
+            }
+        }
     }
 }

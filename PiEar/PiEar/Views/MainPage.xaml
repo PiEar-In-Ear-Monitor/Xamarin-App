@@ -52,18 +52,6 @@
                                             Command="{Binding LabelTap}"/>
                                     </Label.GestureRecognizers>
                                 </Label>
-                                <!-- <Image -->
-                                <!--     WidthRequest="30" -->
-                                <!--     HeightRequest="30" -->
-                                <!--     Source="pan" -->
-                                <!--     HorizontalOptions="End" -->
-                                <!--     VerticalOptions="Center" -->
-                                <!--     BackgroundColor="Transparent" -->
-                                <!--     Rotation="{Binding  Pan}"> -->
-                                <!--     <Image.GestureRecognizers> -->
-                                <!--         <PanGestureRecognizer PanUpdated="PanGestureRecognizer_OnPanUpdated"></PanGestureRecognizer> -->
-                                <!--     </Image.GestureRecognizers> -->
-                                <!-- </Image> -->
                                 <Slider 
                                     ThumbColor="Black"
                                     MinimumTrackColor="Black"
@@ -107,10 +95,22 @@
                 HeightRequest="60"
                 WidthRequest="60"
                 IsEnabled="{Binding Click.Enabled, Mode=TwoWay}"/>
+            <Image
+                WidthRequest="30"
+                HeightRequest="30"
+                Source="pan"
+                HorizontalOptions="End"
+                VerticalOptions="Center"
+                BackgroundColor="Transparent"
+                Rotation="{Binding  Rotation}">
+                <Image.GestureRecognizers>
+                    <PanGestureRecognizer PanUpdated="PanGestureRecognizer_OnPanUpdated"/>
+                </Image.GestureRecognizers>
+            </Image>
             <Label
                 HorizontalOptions="Start"
                 VerticalOptions="Center"
-                Text="{Binding Click.StepCount, StringFormat='Step Size: {0}'}">
+                Text="{Binding Click.StepCount, StringFormat='Steps: {0}'}">
                 <Label.GestureRecognizers>
                     <TapGestureRecognizer
                         Command="{Binding StepperTap}"/>
@@ -129,6 +129,7 @@
                 Text="{Binding Click.Bpm, StringFormat='BPM {0}'}">
                 <Label.GestureRecognizers>
                     <TapGestureRecognizer
+                        NumberOfTapsRequired="2"
                         Command="{Binding ChangeBpm}"/>
                 </Label.GestureRecognizers>
             </Label>

@@ -11,17 +11,30 @@ namespace PiEar.ViewModels
 {
     public class ClickController: INotifyPropertyChanged
     {
+        private double _rotation = -130;
         public Click Click { get; } = new Click();
         public double VolumeDouble => Math.Pow(2, (3 * Click.VolumeMultiplier)) + 1;
+        public ICommand StepperTap { get; }
+        public ICommand ChangeBpm { get; }
+        public double Rotation
+        {
+            get
+            {
+                return _rotation;
+            }
+            set
+            {
+                _rotation = value;
+                Click.VolumeMultiplier = (_rotation / 260) * 1.2;
+                Debug.WriteLine(Click.VolumeMultiplier);
+                OnPropertyChanged();
+            }
+        }
         public ClickController()
         {
             ChangeBpm = new Command(_changeBpm);
             StepperTap = new Command(_stepperTap);
         }
-
-        // Commands to bind to
-        public ICommand StepperTap { get; }
-        public ICommand ChangeBpm { get; }
         private void _stepperTap ()
         {
             switch (Click.StepCount)
@@ -37,8 +50,7 @@ namespace PiEar.ViewModels
                     break;
             }
         }
-
-        private async void _changeBpm(object click)
+        private async void _changeBpm()
         {
             string newBpm = await Application.Current.MainPage.DisplayPromptAsync("What is the BPM?", "");
             try
@@ -50,7 +62,6 @@ namespace PiEar.ViewModels
             {
                 Debug.WriteLine(e);
             }
-
         }
         // REQUIRED STUFF
         public event PropertyChangedEventHandler PropertyChanged;
