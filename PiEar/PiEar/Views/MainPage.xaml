@@ -11,12 +11,12 @@
     </ContentPage.Resources>
     <ContentPage.ToolbarItems>
         <ToolbarItem
-            IconImageSource="icon"
-            Clicked="OpenSettings"
+            IconImageSource="icon" 
+            Clicked="OpenAbout"
         />
         <ToolbarItem
-            Text="Pi-Ear"
-            Clicked="OpenAbout"
+            IconImageSource="settings"
+            Clicked="OpenSettings"
         />
     </ContentPage.ToolbarItems>
     <Grid>
