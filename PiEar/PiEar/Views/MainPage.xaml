@@ -47,7 +47,6 @@
                 Margin="20,0,0,0"
                 IsEnabled="{Binding Click.Enabled, Mode=TwoWay}"/>
             <Image
-                x:Name="ClickVolume"
                 HorizontalOptions="Center"
                 VerticalOptions="Center"
                 WidthRequest="40"

@@ -1,9 +1,13 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using PiEar.Interfaces;
 using PiEar.Models;
 using Plugin.Settings;
-using Plugin.Settings.Abstractions;
+using Xamarin.Forms;
 
 namespace PiEar.Views
 {

@@ -2,6 +2,7 @@
 
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:views="clr-namespace:PiEar.Views;assembly=PiEar"
              x:Class="PiEar.Views.About">
     <NavigationPage.TitleView>
         <Label Text="About Pi-Ear"/>
@@ -11,7 +12,8 @@
             <Label x:Name="License"
                    VerticalOptions="StartAndExpand"
                    HorizontalOptions="CenterAndExpand" />
-            <Label x:Name="Netmask"/>
+            <Label x:Name="Request"/>
+            <Label x:Name="Server"/>
             <Label x:Name="Gateway"/>
             <Label x:Name="Address"/>
         </StackLayout>

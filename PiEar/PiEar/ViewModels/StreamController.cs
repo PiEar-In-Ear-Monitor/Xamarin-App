@@ -43,7 +43,6 @@ namespace PiEar.ViewModels
         {
             Stream.Mute = !Stream.Mute;
         }
-        // REQUIRED STUFF
         public event PropertyChangedEventHandler PropertyChanged;
         [NotifyPropertyChangedInvocator]
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)

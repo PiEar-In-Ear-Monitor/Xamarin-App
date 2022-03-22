@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.IO;
 using System.Reflection;
 using PiEar.ViewModels;
 using Plugin.Settings;
-using Plugin.Settings.Abstractions;
 using Plugin.SimpleAudioPlayer;
 using Xamarin.Forms;
 
 namespace PiEar.Views
 {
+    public class GlobalVariables
+    {
+        private static string ServerAddress = "";
+    }
     public partial class MainPage
     {
         private readonly ObservableCollection<StreamController> _streams = new ObservableCollection<StreamController>();

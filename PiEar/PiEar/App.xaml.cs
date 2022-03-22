@@ -13,7 +13,6 @@ namespace PiEar
         public App()
         {
             InitializeComponent();
-            
             this.MainPage = new NavigationPage(new MainPage());
         }
 

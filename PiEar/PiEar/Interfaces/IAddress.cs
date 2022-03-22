@@ -2,8 +2,9 @@ namespace PiEar.Interfaces
 {
     public interface IAddress
     {
-        string IpAddress();
-        string IpNetmask();
-        string IpGateway();
+        string StringIpAddress();
+        string StringIpGateway();
+        byte[] ByteIpGateway();
+        byte[] ByteIpAddress();
     }
 }
