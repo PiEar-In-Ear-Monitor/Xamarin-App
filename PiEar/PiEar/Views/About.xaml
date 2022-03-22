@@ -11,6 +11,9 @@
             <Label x:Name="License"
                    VerticalOptions="StartAndExpand"
                    HorizontalOptions="CenterAndExpand" />
+            <Label x:Name="Netmask"/>
+            <Label x:Name="Gateway"/>
+            <Label x:Name="Address"/>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

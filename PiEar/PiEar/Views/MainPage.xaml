@@ -11,25 +11,109 @@
     </ContentPage.Resources>
     <ContentPage.ToolbarItems>
         <ToolbarItem
+            Text="PLAY SOUND"
+            Clicked="_pressForSound"
+        />
+        <ToolbarItem
+            x:Name="GlobalMuteIcon"
+            IconImageSource="unmute"
+            Clicked="_muteAudio"
+        />
+        <ToolbarItem
             IconImageSource="icon" 
-            Clicked="OpenAbout"
+            Clicked="_openAbout"
         />
         <ToolbarItem
             IconImageSource="settings"
-            Clicked="OpenSettings"
+            Clicked="_openSettings"
         />
     </ContentPage.ToolbarItems>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
             <RowDefinition Height="60"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <ListView
+        <StackLayout
             Grid.Row="0"
-            Grid.Column="0"
+            Orientation="Horizontal"
+            x:DataType="viewmodels:ClickController">
+            <Switch
+                HorizontalOptions="Start"
+                VerticalOptions="Center"
+                Scale="1.35"
+                Margin="20,0,0,0"
+                IsEnabled="{Binding Click.Enabled, Mode=TwoWay}"/>
+            <Image
+                x:Name="ClickVolume"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                WidthRequest="40"
+                HeightRequest="40"
+                Source="pan"
+                BackgroundColor="Transparent"
+                Margin="0, 0"
+                Rotation="{Binding  Rotation}">
+                <Image.GestureRecognizers>
+                    <PanGestureRecognizer PanUpdated="_panVolume"/>
+                </Image.GestureRecognizers>
+            </Image>
+            <Frame CornerRadius="20"
+                   BackgroundColor="LightGray"
+                   Padding="15, 0"
+                   Margin="30, 5, 10, 0">
+                <StackLayout Orientation="Horizontal">
+                    <Label
+                        HorizontalOptions="Start"
+                        VerticalOptions="Center"
+                        FontAttributes="Bold"
+                        WidthRequest="20"
+                        FontSize="43"
+                        Text="-">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding MinusStepper}"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <Label
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center"
+                        WidthRequest="40"
+                        FontSize="35"
+                        Text="{Binding Click.StepCount, StringFormat='{0,2}'}">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer
+                                NumberOfTapsRequired="1"
+                                Command="{Binding StepperTap}"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <Label
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center"
+                        FontSize="40"
+                        Text="+">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding PlusStepper}"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                </StackLayout>
+            </Frame>
+            <Label
+                HorizontalOptions="EndAndExpand"
+                VerticalOptions="CenterAndExpand"
+                FontSize="20"
+                Padding="10, 0"
+                Text="{Binding Click.Bpm, StringFormat='BPM: {0:##0}'}">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer
+                        NumberOfTapsRequired="2"
+                        Command="{Binding ChangeBpm}"/>
+                </Label.GestureRecognizers>
+            </Label>
+        </StackLayout>
+        <ListView
+            Grid.Row="1"
             x:Name="ListOfChannels"
             SelectionMode="None">
             <ListView.ItemTemplate>
@@ -60,13 +144,13 @@
                                     VerticalOptions="Center"
                                     WidthRequest="170"
                                     HeightRequest="30"
-                                    Maximum="1.2"
-                                    Value="{Binding Stream.VolumeMultiplier}"
+                                    Maximum="1"
+                                    Value="{Binding Stream.Volume}"
                                     IsEnabled="{Binding Stream.Mute, Converter={StaticResource CustomBoolConverter}}"/>
                                 <Label
                                     HorizontalOptions="End"
                                     VerticalOptions="CenterAndExpand"
-                                    Text="{Binding Path=Stream.VolumeMultiplier, Converter={StaticResource CustomVolumeConverter}, StringFormat='{0:##0}%'}"/>                
+                                    Text="{Binding Path=Stream.Volume, Converter={StaticResource CustomVolumeConverter}, StringFormat='{0:##0}%'}"/>                
                                 <Image
                                     WidthRequest="30"
                                     HeightRequest="30"
@@ -85,54 +169,5 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <StackLayout
-            Grid.Row="1"
-            Orientation="Horizontal"
-            x:DataType="viewmodels:ClickController">
-            <Switch
-                VerticalOptions="Center"
-                HorizontalOptions="Start"
-                HeightRequest="60"
-                WidthRequest="60"
-                IsEnabled="{Binding Click.Enabled, Mode=TwoWay}"/>
-            <Image
-                WidthRequest="30"
-                HeightRequest="30"
-                Source="pan"
-                HorizontalOptions="End"
-                VerticalOptions="Center"
-                BackgroundColor="Transparent"
-                Rotation="{Binding  Rotation}">
-                <Image.GestureRecognizers>
-                    <PanGestureRecognizer PanUpdated="PanGestureRecognizer_OnPanUpdated"/>
-                </Image.GestureRecognizers>
-            </Image>
-            <Label
-                HorizontalOptions="Start"
-                VerticalOptions="Center"
-                Text="{Binding Click.StepCount, StringFormat='Steps: {0}'}">
-                <Label.GestureRecognizers>
-                    <TapGestureRecognizer
-                        Command="{Binding StepperTap}"/>
-                </Label.GestureRecognizers>
-            </Label>
-            <Stepper
-                VerticalOptions="Center"
-                HorizontalOptions="Center"
-                Maximum = "200"
-                ScaleX="0.75"
-                Value="{Binding Click.Bpm}"
-                Increment="{Binding Click.StepCount}"/>
-            <Label
-                VerticalOptions="Center"
-                HorizontalOptions="End"
-                Text="{Binding Click.Bpm, StringFormat='BPM {0}'}">
-                <Label.GestureRecognizers>
-                    <TapGestureRecognizer
-                        NumberOfTapsRequired="2"
-                        Command="{Binding ChangeBpm}"/>
-                </Label.GestureRecognizers>
-            </Label>
-        </StackLayout>
     </Grid>
 </ContentPage>

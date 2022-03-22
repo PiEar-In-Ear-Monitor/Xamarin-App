@@ -1,80 +1,54 @@
+using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using PiEar.Annotations;
+using Plugin.Settings;
 
 namespace PiEar.Models
 {
     public class Stream : INotifyPropertyChanged
     {
-        private static int _count = 0;
-        public string Id { get; } = _count++.ToString();
-        private string _label;
-        private bool _mute;
-        private double _pan;
-        private double _volumeMultiplier;
+        public static int Count = 0;
+        private string Id { get; } = Count++.ToString();
         public string Label 
         {
-            get
-            {
-                return _label;
-            }
+            get => CrossSettings.Current.GetValueOrDefault($"channelLabel{Id}", $"Channel {Id}", Settings.File);
             set
             {
-                _label = value;
+                CrossSettings.Current.AddOrUpdateValue($"channelLabel{Id}", value, Settings.File);
                 OnPropertyChanged();
             }
-            
         }
         public bool Mute
         {
-            get
-            {
-                return _mute;
-            }
+            get => CrossSettings.Current.GetValueOrDefault($"channelMute{Id}", false, Settings.File);
             set
             {
-                _mute = value;
+                CrossSettings.Current.AddOrUpdateValue($"channelMute{Id}", value, Settings.File);
                 OnPropertyChanged();
             }
         }
         public double Pan
         {
-            get
-            {
-                return _pan;
-            }
+            get => CrossSettings.Current.GetValueOrDefault($"channelPan{Id}", 0.0, Settings.File);
             set
             {
-                _pan = value;
+                CrossSettings.Current.AddOrUpdateValue($"channelPan{Id}", value, Settings.File);
                 OnPropertyChanged();
             }
         }
-        public double VolumeMultiplier
+        public double Volume
         {
-            get
-            {
-                return _volumeMultiplier;
-            }
+            get => Convert.ToDouble(CrossSettings.Current.GetValueOrDefault($"channelVolume{Id}", 0.0, Settings.File));
             set
             {
-                _volumeMultiplier = value;
+                CrossSettings.Current.AddOrUpdateValue($"channelVolume{Id}", value, Settings.File);
                 OnPropertyChanged();
             }
         }
-        public Stream(string label)
-        {
-            _label = label;
-            _mute =false;
-            _pan = 0.0;
-            _volumeMultiplier = 0.0;
-        }
-        public Stream()
-        {
-            _label = $"Channel {_count + 1}";
-            _mute =false;
-            _pan = 0.0;
-            _volumeMultiplier = 0.0;
-        }
+        public Stream(string label) { Label = label; }
+        public Stream() { }
         public event PropertyChangedEventHandler PropertyChanged;
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

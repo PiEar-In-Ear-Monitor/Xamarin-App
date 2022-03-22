@@ -46,10 +46,13 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
+        <PackageReference Include="Xam.Plugin.SimpleAudioPlayer" Version="1.5.0" />
+        <PackageReference Include="Xam.Plugins.Settings" Version="3.1.1" />
         <PackageReference Include="Xamarin.Android.Support.v7.AppCompat" Version="28.0.0.3" />
         <PackageReference Include="Xamarin.Forms" Version="5.0.0.2337" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Interfaces\Address.cs" />
         <Compile Include="MainActivity.cs" />
         <Compile Include="Resources\Resource.designer.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />

@@ -11,21 +11,19 @@ namespace PiEar.ViewModels
 {
     public sealed class ClickController: INotifyPropertyChanged
     {
-        private double _rotation = -130;
+        private int _minimum = 0;
+        private int _maximum = 360;
         public Click Click { get; } = new Click();
-        public double VolumeDouble => Math.Pow(2, (3 * Click.VolumeMultiplier)) + 1;
         public ICommand StepperTap { get; }
         public ICommand ChangeBpm { get; }
+        public ICommand MinusStepper { get; }
+        public ICommand PlusStepper { get; }
         public double Rotation
         {
-            get
-            {
-                return _rotation;
-            }
+            get => (Click.Volume * 260) - 130;
             set
             {
-                _rotation = value;
-                Click.VolumeMultiplier = ((_rotation / 260) * 1.2) + 0.6;
+                Click.Volume = (value + 130) / 260;
                 OnPropertyChanged();
             }
         }
@@ -33,6 +31,8 @@ namespace PiEar.ViewModels
         {
             ChangeBpm = new Command(_changeBpm);
             StepperTap = new Command(_stepperTap);
+            MinusStepper = new Command(_minusStepper);
+            PlusStepper = new Command(_plusStepper);
         }
         private void _stepperTap ()
         {
@@ -55,14 +55,32 @@ namespace PiEar.ViewModels
             try
             {
                 int intBpm = int.Parse(newBpm);
-                Click.Bpm = intBpm;
+                if (intBpm <= _maximum && intBpm >= _minimum)
+                {
+                    Click.Bpm = intBpm;
+                }
             }
             catch (Exception e)
             {
                 Debug.WriteLine(e);
             }
         }
-        // REQUIRED STUFF
+        private void _minusStepper()
+        {
+            Click.Bpm -= Click.StepCount;
+            if (Click.Bpm < _minimum)
+            {
+                Click.Bpm = _minimum;
+            }
+        }
+        private void _plusStepper()
+        {
+            Click.Bpm += Click.StepCount;
+            if (Click.Bpm > _maximum)
+            {
+                Click.Bpm = _maximum;
+            }
+        }
         public event PropertyChangedEventHandler PropertyChanged;
         [NotifyPropertyChangedInvocator]
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)

@@ -17,13 +17,14 @@ namespace PiEar.ViewModels
             ImageTap = new Command(_imageTap);
             Stream.Label = label;
         }
+        public StreamController()
+        {
+            LabelTap = new Command(_labelTap);
+            ImageTap = new Command(_imageTap);
+        }
         public Stream Stream { get; } = new Stream();
-        public double VolumeDouble => Math.Pow(2, (3 * Stream.VolumeMultiplier)) + 1;
-
-        // Commands to bind to
         public ICommand LabelTap { get; }
         public ICommand ImageTap { get; }
-        
         private async void _labelTap () 
         {
             

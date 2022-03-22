@@ -10,6 +10,22 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Xam.Plugin.SimpleAudioPlayer" Version="1.5.0" />
+      <PackageReference Include="Xam.Plugins.Settings" Version="3.1.1" />
       <PackageReference Include="Xamarin.Forms" Version="5.0.0.2337" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="Click\Beep.ogg" />
+      <EmbeddedResource Include="Click\Click.ogg" />
+      <EmbeddedResource Include="Click\Clink.ogg" />
+      <EmbeddedResource Include="Click\Clonk.ogg" />
+      <EmbeddedResource Include="Click\Cluck.ogg" />
+      <EmbeddedResource Include="Click\Metal.ogg" />
+      <EmbeddedResource Include="Click\Plastic.ogg" />
+      <EmbeddedResource Include="Click\Sticks.ogg" />
+      <EmbeddedResource Include="Click\Tap.ogg" />
+      <EmbeddedResource Include="Click\Wood.ogg" />
+      <None Remove="appsettings.json" />
     </ItemGroup>
 </Project>

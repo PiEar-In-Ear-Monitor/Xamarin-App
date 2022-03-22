@@ -5,46 +5,33 @@ namespace PiEar.Models
         private int _bpm = 100;
         private bool _enabled = false;
         private int _stepCount = 10;
-        public string AudioFile { get; set; }
         public int Bpm
         {
-            get
-            {
-                return _bpm;
-            }
+            get => _bpm; // TODO make API  call
             set 
             { 
-                _bpm = value;
+                _bpm = value; // TODO make API call
                 OnPropertyChanged();
             }
         }
         public bool Enabled
         {
-            get
-            {
-                return _enabled;
-            }
+            get => _enabled; // TODO make API call
             set
             {
-                _enabled = !_enabled;
+                _enabled = !_enabled; // TODO make API call
                 OnPropertyChanged();
             }
         }
         public int StepCount
         {
-            get
-            {
-                return _stepCount;
-            }
+            get => _stepCount;
             set
             {
                 _stepCount = value;
                 OnPropertyChanged();
             }
         }
-        public Click()
-        {
-            Label = "Click";
-        }
+        public Click() { }
     }
 }
