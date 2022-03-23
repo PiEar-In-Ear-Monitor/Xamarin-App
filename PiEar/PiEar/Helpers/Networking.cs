@@ -8,7 +8,7 @@ using Xamarin.Forms;
 
 namespace PiEar.Helpers
 {
-    public class Networking
+    public static class Networking
     {
         private static bool _foundIp = false;
         private static string _serverIp = null;
@@ -45,7 +45,7 @@ namespace PiEar.Helpers
             byte[] gateway = DependencyService.Get<IAddress>().ByteIpGateway();
             byte[] toCheck = new byte[4];
             int diff = 0;
-            bool[] maxSet = new bool[] {false, false, false};
+            bool[] maxSet = {false, false, false};
             for (int i = 0; i < 4; i++)
             {
                 toCheck[i] = gateway[i];

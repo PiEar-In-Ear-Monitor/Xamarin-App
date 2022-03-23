@@ -9,7 +9,7 @@ namespace PiEar.Models
 {
     public class Stream : INotifyPropertyChanged
     {
-        public static int Count = 0;
+        protected static int Count;
         private string Id { get; } = Count++.ToString();
         public string Label 
         {
@@ -48,7 +48,11 @@ namespace PiEar.Models
             }
         }
         public Stream(string label) { Label = label; }
-        public Stream() { }
+        public Stream() {}
+        public static void Reset()
+        {
+            Count = 0;
+        }
         public event PropertyChangedEventHandler PropertyChanged;
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

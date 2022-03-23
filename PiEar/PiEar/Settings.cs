@@ -2,7 +2,7 @@ namespace PiEar
 {
     public static class Settings
     {
-        public const string File = "Settings.set";
-        public const string Click = "Clonk";
+        public static readonly string File = "Settings.set";
+        public static readonly string Click = "Clonk";
     }
 }

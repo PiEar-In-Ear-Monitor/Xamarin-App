@@ -11,8 +11,8 @@ namespace PiEar.ViewModels
 {
     public sealed class ClickController: INotifyPropertyChanged
     {
-        private int _minimum = 0;
-        private int _maximum = 360;
+        private readonly int _minimum;
+        private readonly int _maximum = 360;
         public Click Click { get; } = new Click();
         public ICommand StepperTap { get; }
         public ICommand ChangeBpm { get; }

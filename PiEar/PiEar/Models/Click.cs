@@ -32,6 +32,5 @@ namespace PiEar.Models
                 OnPropertyChanged();
             }
         }
-        public Click() { }
     }
 }

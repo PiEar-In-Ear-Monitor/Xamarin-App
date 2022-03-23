@@ -8,10 +8,6 @@ using Xamarin.Forms;
 
 namespace PiEar.Views
 {
-    public class GlobalVariables
-    {
-        private static string ServerAddress = "";
-    }
     public partial class MainPage
     {
         private readonly ObservableCollection<StreamController> _streams = new ObservableCollection<StreamController>();

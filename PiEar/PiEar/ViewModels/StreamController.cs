@@ -31,7 +31,10 @@ namespace PiEar.ViewModels
             try
             {
                 string newLabel = await Application.Current.MainPage.DisplayPromptAsync("What would you like to name this channel?", "");
-                if (newLabel.Length <= 0) return;
+                if (newLabel.Length <= 0)
+                {
+                    return;
+                }
                 Stream.Label = ((newLabel.Length > 26 ) ? newLabel.Substring(0, 26) : newLabel );
             }
             catch (Exception ex)
