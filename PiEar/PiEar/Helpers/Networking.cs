@@ -1,6 +1,7 @@
+using System;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using PiEar.Interfaces;
 using Xamarin.Forms;
@@ -9,13 +10,36 @@ namespace PiEar.Helpers
 {
     public class Networking
     {
-        public static async Task<string> GetRequest(string Url)
+        private static bool _foundIp = false;
+        private static string _serverIp = null;
+
+        public static string ServerIp => (_foundIp) ? _serverIp : "IP Not Found";
+        private const int Port = 9090;
+        public static async Task<string> GetRequest(string endpoint)
         {
-            HttpClient client = new HttpClient();
-            HttpResponseMessage response = await client.GetAsync(Url);
-            return await response.Content.ReadAsStringAsync();
+            if (ServerIp == null)
+            {
+                return "";
+            }
+            try
+            {
+                WebRequest request = WebRequest.Create ($"http://{_serverIp}:{Port}{endpoint}");
+                request.Timeout = 150;
+                HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
+                Stream dataStream = response.GetResponseStream();
+                StreamReader reader = new StreamReader(dataStream);
+                string responseFromServer = reader.ReadToEnd();
+                reader.Close ();
+                dataStream.Close ();
+                response.Close ();
+                return responseFromServer;
+            }
+            catch (Exception e)
+            {
+                return "";
+            }
         }
-        public static async Task<string> FindServerIp()
+        public static async void FindServerIp()
         {
             byte[] address = DependencyService.Get<IAddress>().ByteIpAddress();
             byte[] gateway = DependencyService.Get<IAddress>().ByteIpGateway();
@@ -35,36 +59,31 @@ namespace PiEar.Helpers
                     maxSet[i] = true;
                 }
             }
-            bool foundIp = false;
-            
-            // var request = new RestRequest("abcdefghijklmnopqrstuvwxyz");
-            while ((!foundIp))
+            string resp;
+            while (!_foundIp)
             {
-                if (toCheck[3] == 0)
+                for (int i = 0; i < 256; i++)
                 {
-                    // Make Request
-                    Debug.WriteLine($"Making request to {new IPAddress(toCheck)}");
+                    byte[] intBytes = BitConverter.GetBytes(i);
+                    Array.Reverse(intBytes);
+                    toCheck[3] = intBytes[3];
+                    _serverIp = new IPAddress(toCheck).ToString();
+                    resp = await GetRequest("/abcdefghijklmnopqrstuvwxyz");
+                    if (resp == "zyxwvutsrqponmlkjihgfedcba")
+                    {
+                        _foundIp = true;
+                        break;
+                    }
                 }
-                toCheck[3]++;
-                // Make Request
-                Debug.WriteLine($"Making request to {new IPAddress(toCheck)}");
-                if (toCheck[3] == 255)
+                if (maxSet[0] && maxSet[1] && maxSet[2] && toCheck[3] == 255)
                 {
-                    if (maxSet[0] && maxSet[1] && maxSet[2] && toCheck[3] == 255)
-                    {
-                        foundIp = true;
-                    }
-                    else
-                    {
-                        toCheck[3] = 0;
-                        if (++toCheck[diff] == 255)
-                        {
-                            maxSet[diff++] = true;
-                        }
-                    }
+                    break;
+                }
+                if (++toCheck[diff] == 255)
+                {
+                    maxSet[diff++] = true;
                 }
             }
-            return (toCheck[3] == 255) ? "0.0.0.0" : (new IPAddress(toCheck).ToString());
         }
     }
 }

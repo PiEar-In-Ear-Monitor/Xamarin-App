@@ -1,5 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-using PiEar.ViewModels;
+using PiEar.Helpers;
 using PiEar.Views;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -17,8 +17,8 @@ namespace PiEar
         }
 
         protected override void OnStart()
-        {
-            // Handle when your app starts
+        {            
+            Networking.FindServerIp();
         }
 
         protected override void OnSleep()
