@@ -24,7 +24,7 @@ namespace PiEar.Helpers
             try
             {
                 WebRequest request = WebRequest.Create ($"http://{_serverIp}:{Port}{endpoint}");
-                request.Timeout = 150;
+                request.Timeout = 500;
                 HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
                 Stream dataStream = response.GetResponseStream();
                 StreamReader reader = new StreamReader(dataStream);
@@ -59,7 +59,7 @@ namespace PiEar.Helpers
                     maxSet[i] = true;
                 }
             }
-            string resp;
+            // toCheck[2] = 156; // Save a lot of time!
             while (!_foundIp)
             {
                 for (int i = 0; i < 256; i++)
@@ -68,8 +68,7 @@ namespace PiEar.Helpers
                     Array.Reverse(intBytes);
                     toCheck[3] = intBytes[3];
                     _serverIp = new IPAddress(toCheck).ToString();
-                    resp = await GetRequest("/abcdefghijklmnopqrstuvwxyz");
-                    if (resp == "zyxwvutsrqponmlkjihgfedcba")
+                    if (await GetRequest("/abcdefghijklmnopqrstuvwxyz") == "zyxwvutsrqponmlkjihgfedcba")
                     {
                         _foundIp = true;
                         break;
