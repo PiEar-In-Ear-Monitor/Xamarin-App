@@ -27,17 +27,21 @@ namespace PiEar.Helpers
                 request.Timeout = 500;
                 HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
                 Stream dataStream = response.GetResponseStream();
-                StreamReader reader = new StreamReader(dataStream);
-                string responseFromServer = reader.ReadToEnd();
-                reader.Close ();
-                dataStream.Close ();
-                response.Close ();
-                return responseFromServer;
+                if (dataStream != null)
+                {
+                    StreamReader reader = new StreamReader(dataStream);
+                    string responseFromServer = await reader.ReadToEndAsync();
+                    reader.Close ();
+                    dataStream.Close ();
+                    response.Close ();
+                    return responseFromServer;
+                }
             }
             catch (Exception e)
             {
                 return "";
             }
+            return "";
         }
         public static async void FindServerIp()
         {

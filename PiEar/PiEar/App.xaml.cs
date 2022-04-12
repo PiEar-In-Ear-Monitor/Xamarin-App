@@ -18,7 +18,7 @@ namespace PiEar
 
         protected override void OnStart()
         {            
-            Networking.FindServerIp();
+            // Handle when your app starts
         }
 
         protected override void OnSleep()

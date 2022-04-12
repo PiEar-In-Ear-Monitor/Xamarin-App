@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Reflection;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using PiEar.Helpers;
 using PiEar.ViewModels;
 using Plugin.Settings;
 using Plugin.SimpleAudioPlayer;
@@ -18,11 +22,8 @@ namespace PiEar.Views
         public MainPage()
         {
             InitializeComponent();
+            if (_streams.Count == 0) _setupChannels();
             BindingContext = _clickController;
-            for (int i = 0; i < 20; i++)
-            {
-                _streams.Add(new StreamController());
-            }
         }
         protected override void OnAppearing()
         {
@@ -66,6 +67,44 @@ namespace PiEar.Views
         {
             _player.Volume = _clickController.Click.Volume;
             _player.Play();
+        }
+        
+        private class JsonData
+        {
+            [JsonProperty("channel_name")]
+            public string Channel { get; set; }
+            [JsonProperty("error")]
+            public string Error { get; set; }
+        }
+        
+        private async void _setupChannels()
+        {
+            Networking.FindServerIp();
+            while(Networking.ServerIp == "IP Not Found")
+            {
+                await Task.Delay(1000);
+            }
+            while (true)
+            {
+                String resp = await Networking.GetRequest($"/channel-name?id={_streams.Count + 1}");
+                Debug.WriteLine(resp);
+                var channel = JsonConvert.DeserializeObject<JsonData>(resp);
+                if (channel != null && channel.Error == null)
+                {
+                    Debug.WriteLine(channel.Channel);
+                    _streams.Add(new StreamController(channel.Channel));
+                }
+                else
+                {
+                    break;
+                }
+            };
+            for (int i = 0; i < _streams.Count; i++)
+            {
+                _streams.Add(new StreamController());
+            }
+            ListOfChannels.ItemsSource = null;
+            ListOfChannels.ItemsSource = _streams;
         }
     }
 }
