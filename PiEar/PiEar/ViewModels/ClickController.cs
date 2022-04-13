@@ -29,6 +29,7 @@ namespace PiEar.ViewModels
         }
         public ClickController()
         {
+            _minimum = 0;
             ChangeBpm = new Command(_changeBpm);
             StepperTap = new Command(_stepperTap);
             MinusStepper = new Command(_minusStepper);

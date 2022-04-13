@@ -1,22 +1,15 @@
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Windows.Input;
-using PiEar.Annotations;
+using Newtonsoft.Json;
+using PiEar.Helpers;
 using PiEar.Models;
 using Xamarin.Forms;
 
 namespace PiEar.ViewModels
 {
-    public sealed class StreamController: INotifyPropertyChanged
+    public sealed class StreamController
     {
-        public StreamController(string label)
-        {
-            LabelTap = new Command(_labelTap);
-            ImageTap = new Command(_imageTap);
-            Stream.Label = label;
-        }
         public StreamController()
         {
             LabelTap = new Command(_labelTap);
@@ -27,7 +20,6 @@ namespace PiEar.ViewModels
         public ICommand ImageTap { get; }
         private async void _labelTap () 
         {
-            
             try
             {
                 string newLabel = await Application.Current.MainPage.DisplayPromptAsync("What would you like to name this channel?", "");
@@ -45,12 +37,6 @@ namespace PiEar.ViewModels
         private void _imageTap ()
         {
             Stream.Mute = !Stream.Mute;
-        }
-        public event PropertyChangedEventHandler PropertyChanged;
-        [NotifyPropertyChangedInvocator]
-        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

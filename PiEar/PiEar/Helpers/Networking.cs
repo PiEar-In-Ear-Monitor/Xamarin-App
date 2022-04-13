@@ -15,9 +15,10 @@ namespace PiEar.Helpers
 
         public static string ServerIp => (_foundIp) ? _serverIp : "IP Not Found";
         private const int Port = 9090;
-        public static async Task<string> GetRequest(string endpoint)
+        public static async Task<string> GetRequest(string endpoint, bool forDiscovery = false)
         {
-            if (ServerIp == null)
+            Debug.WriteLine($"Getting {endpoint}");
+            if (ServerIp == "IP Not Found" && !forDiscovery)
             {
                 return "";
             }
@@ -27,21 +28,47 @@ namespace PiEar.Helpers
                 request.Timeout = 500;
                 HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
                 Stream dataStream = response.GetResponseStream();
-                if (dataStream != null)
-                {
-                    StreamReader reader = new StreamReader(dataStream);
-                    string responseFromServer = await reader.ReadToEndAsync();
-                    reader.Close ();
-                    dataStream.Close ();
-                    response.Close ();
-                    return responseFromServer;
-                }
+                StreamReader reader = new StreamReader(dataStream);
+                string responseFromServer = await reader.ReadToEndAsync();
+                reader.Close ();
+                dataStream.Close ();
+                response.Close ();
+                return responseFromServer;
             }
             catch (Exception e)
             {
                 return "";
             }
             return "";
+        }
+        public static async Task<string> PutRequest(string endpoint)
+        {
+            if (ServerIp == "IP Not Found")
+            {
+                return "";
+            }
+            try
+            {
+                WebRequest request = WebRequest.Create ($"http://{ServerIp}:{Port}{endpoint}");
+                request.Method = "PUT";
+                request.Timeout = 500;
+                HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
+                Stream dataStream = response.GetResponseStream();
+                if (dataStream != null)
+                {
+                    StreamReader reader = new StreamReader(dataStream);
+                    string responseFromServer = await reader.ReadToEndAsync();
+                    reader.Close();
+                    dataStream.Close();
+                    response.Close();
+                    return responseFromServer;
+                }
+                return "";
+            }
+            catch (Exception e)
+            {
+                return "";
+            }
         }
         public static async void FindServerIp()
         {
@@ -63,7 +90,7 @@ namespace PiEar.Helpers
                     maxSet[i] = true;
                 }
             }
-            // toCheck[2] = 156; // Save a lot of time!
+            // toCheck[2] = 154; // Save a lot of time!
             while (!_foundIp)
             {
                 for (int i = 0; i < 256; i++)
@@ -72,7 +99,7 @@ namespace PiEar.Helpers
                     Array.Reverse(intBytes);
                     toCheck[3] = intBytes[3];
                     _serverIp = new IPAddress(toCheck).ToString();
-                    if (await GetRequest("/abcdefghijklmnopqrstuvwxyz") == "zyxwvutsrqponmlkjihgfedcba")
+                    if (await GetRequest("/abcdefghijklmnopqrstuvwxyz", true) == "zyxwvutsrqponmlkjihgfedcba")
                     {
                         _foundIp = true;
                         break;
