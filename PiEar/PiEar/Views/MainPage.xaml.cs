@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
+using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -81,6 +83,56 @@ namespace PiEar.Views
             }
             ListOfChannels.ItemsSource = null;
             ListOfChannels.ItemsSource = _streams;
+        }
+        
+        // // Server-Sent Events Client
+        // private void _serverSentEventsClient()
+        // {
+        //     var client = new SSEClient(Networking.ServerIp, 9090);
+        //     client.OnMessage += (sender, e) =>
+        //     {
+        //         var message = JsonConvert.DeserializeObject<StreamMessage>(e.Data);
+        //         if (message.Channel == "click")
+        //         {
+        //             _clickController.Click = message;
+        //         }
+        //         else
+        //         {
+        //             var stream = _streams.Find(x => x.Channel == message.Channel);
+        //             stream.Stream = message;
+        //         }
+        //     };
+        //     client.Start();
+        // }
+        private async void _sse()
+        {
+            HttpClient client = new HttpClient();
+            client.Timeout = TimeSpan.FromSeconds(5);
+            string url = $"http://localhost:9090/channel-name/listen";
+            while (true)
+            {
+                try
+                {
+                    Debug.WriteLine("Establishing connection");
+                    using (var streamReader = new StreamReader(await client.GetStreamAsync(url)))
+                    {
+                        while (!streamReader.EndOfStream)
+                        {
+                            var message = await streamReader.ReadLineAsync();
+                            Debug.WriteLine($"Received: {message}");
+                        }
+                    }
+                }
+                catch(Exception ex)
+                {
+                    //Here you can check for 
+                    //specific types of errors before continuing
+                    //Since this is a simple example, i'm always going to retry
+                    Debug.WriteLine($"Error: {ex.Message}");
+                    Debug.WriteLine("Retrying in 5 seconds");
+                    await Task.Delay(TimeSpan.FromSeconds(5));
+                }
+            }
         }
     }
 }
