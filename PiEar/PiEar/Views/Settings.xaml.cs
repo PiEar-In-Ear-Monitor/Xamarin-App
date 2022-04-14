@@ -38,7 +38,6 @@ namespace PiEar.Views
             bool answer = await DisplayAlert ("Confirmation", "Are you sure you want to reset?", "Yes", "No");
             if (answer)
             {
-                Stream.Reset();
                 string clickBackup = _clickFilename;
                 CrossSettings.Current.Clear(PiEar.Settings.File);
                 _clickFilename = clickBackup;

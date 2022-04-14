@@ -22,17 +22,15 @@ namespace PiEar.Views
         public MainPage()
         {
             InitializeComponent();
-            if (_streams.Count == 0) _setupChannels();
             BindingContext = _clickController;
+            _setupChannels();
         }
         protected override void OnAppearing()
         {
-            _clickController.Rotation = _clickController.Rotation;
             ListOfChannels.ItemsSource = null;
             ListOfChannels.ItemsSource = _streams;
-            var assembly = typeof(App).GetTypeInfo().Assembly;
-            var stream = assembly.GetManifestResourceStream(_clickFilename);
-            _player.Load(stream);
+            _clickController.Rotation = _clickController.Rotation;
+            _player.Load(typeof(App).GetTypeInfo().Assembly.GetManifestResourceStream(_clickFilename));
         }
         private async void _openSettings(object sender, EventArgs e)
         {
@@ -44,7 +42,6 @@ namespace PiEar.Views
         }
         private void _panVolume(object sender, PanUpdatedEventArgs e)
         {
-            Image image = (Image)sender; 
             if (e.StatusType == GestureStatus.Running)
             {
                 _clickController.Rotation += e.TotalX / 2.0;
@@ -68,38 +65,17 @@ namespace PiEar.Views
             _player.Volume = _clickController.Click.Volume;
             _player.Play();
         }
-        
-        private class JsonData
-        {
-            [JsonProperty("channel_name")]
-            public string Channel { get; set; }
-            [JsonProperty("error")]
-            public string Error { get; set; }
-        }
-        
         private async void _setupChannels()
         {
             Networking.FindServerIp();
             while(Networking.ServerIp == "IP Not Found")
             {
-                await Task.Delay(1000);
+                await Task.Delay(500);
             }
-            while (true)
-            {
-                String resp = await Networking.GetRequest($"/channel-name?id={_streams.Count + 1}");
-                Debug.WriteLine(resp);
-                var channel = JsonConvert.DeserializeObject<JsonData>(resp);
-                if (channel != null && channel.Error == null)
-                {
-                    Debug.WriteLine(channel.Channel);
-                    _streams.Add(new StreamController(channel.Channel));
-                }
-                else
-                {
-                    break;
-                }
-            };
-            for (int i = 0; i < _streams.Count; i++)
+            var channelCount = await Networking.GetRequest("/");
+            channelCount = channelCount.Replace("{\"channel_count\":", "");
+            channelCount = channelCount.Replace("}", "");
+            for (int i = 0; i < int.Parse(channelCount) - 1; i++)
             {
                 _streams.Add(new StreamController());
             }
