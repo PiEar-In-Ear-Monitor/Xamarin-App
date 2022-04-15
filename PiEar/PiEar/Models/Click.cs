@@ -11,24 +11,13 @@ namespace PiEar.Models
     {
         private bool _enabled = false;
         private int _stepCount = 10;
+        private int _bpm = -1;
         public int Bpm
         {
-            get
-            {   
-                var resp = Task.Run(async () => await Networking.GetRequest($"/bpm"));
-                resp.Wait();
-                Debug.WriteLine(resp.Result);
-                var channel = JsonConvert.DeserializeObject<JsonData>(resp.Result);
-                if (channel != null && channel.Error == null)
-                {
-                    Debug.WriteLine(channel.Bpm);
-                    return channel.Bpm;
-                }
-                return 0;
-            } 
+            get => _bpm;
             set
             {
-                if (value is int)
+                if (value != -1)
                 {
                     var resp = Task.Run(async () => await Networking.PutRequest($"/bpm/{value}"));
                     resp.Wait();
@@ -54,9 +43,10 @@ namespace PiEar.Models
                 OnPropertyChanged();
             }
         }
-        public void ChangeBpm()
+        public void ChangeBpm(int bpm)
         {
-            OnPropertyChanged(nameof(Bpm));
+            _bpm = bpm;
+            Bpm = -1;
         }
     }
 }

@@ -8,9 +8,11 @@ namespace PiEar.Models
         public string ChannelName { get; set; }
         [JsonProperty("error")]
         public string Error { get; set; }
-        [JsonProperty("bpm")]
-        public int Bpm { get; set; }
+
+        [JsonProperty("bpm")] public int Bpm { get; set; } = -1;
         [JsonProperty("channel_count")]
         public int ChannelCount { get; set; }
+        [JsonProperty("id")]
+        public int Id { get; set; }
     }
 }

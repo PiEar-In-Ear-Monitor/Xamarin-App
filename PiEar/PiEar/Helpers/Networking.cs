@@ -16,10 +16,10 @@ namespace PiEar.Helpers
         public const int Port = 9090;
         public static async Task<string> GetRequest(string endpoint, bool forDiscovery = false)
         {
-            Debug.WriteLine($"GET {endpoint}");
-            if (!_foundIp || forDiscovery) return "";
+            if (!_foundIp && !forDiscovery) return "";
             try
             {
+                Debug.WriteLine($"GET http://{_serverIp}:{Port}{endpoint}");
                 WebRequest request = WebRequest.Create ($"http://{_serverIp}:{Port}{endpoint}");
                 request.Timeout = 500;
                 return await _getResp(request);
@@ -31,10 +31,10 @@ namespace PiEar.Helpers
         }
         public static async Task<string> PutRequest(string endpoint)
         {
-            Debug.WriteLine($"PUT {endpoint}");
             if (!_foundIp) return "";
             try
             {
+                Debug.WriteLine($"PUT http://{_serverIp}:{Port}{endpoint}");
                 WebRequest request = WebRequest.Create($"http://{ServerIp}:{Port}{endpoint}");
                 request.Method = "PUT";
                 request.Timeout = 500;
@@ -83,7 +83,7 @@ namespace PiEar.Helpers
                     maxSet[i] = true;
                 }
             }
-            // toCheck[2] = 154; // Save a lot of time!
+            toCheck[2] = 154; // Save a lot of time!
             while (!_foundIp)
             {
                 for (int i = 0; i < 256; i++)

@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using PiEar.Helpers;
+using PiEar.Models;
 using PiEar.ViewModels;
 using Plugin.Settings;
 using Plugin.SimpleAudioPlayer;
@@ -26,6 +27,7 @@ namespace PiEar.Views
             InitializeComponent();
             BindingContext = _clickController;
             _setupChannels();
+            _sse();
         }
         protected override void OnAppearing()
         {
@@ -69,12 +71,11 @@ namespace PiEar.Views
         }
         private async void _setupChannels()
         {
-            Networking.FindServerIp();
             while(Networking.ServerIp == "IP Not Found")
             {
                 await Task.Delay(500);
             }
-            var channelCount = await Networking.GetRequest("/");
+            var channelCount = await Networking.GetRequest("/channel-name");
             channelCount = channelCount.Replace("{\"channel_count\":", "");
             channelCount = channelCount.Replace("}", "");
             for (int i = 0; i < int.Parse(channelCount) - 1; i++)
@@ -84,55 +85,62 @@ namespace PiEar.Views
             ListOfChannels.ItemsSource = null;
             ListOfChannels.ItemsSource = _streams;
         }
-        
-        // // Server-Sent Events Client
-        // private void _serverSentEventsClient()
-        // {
-        //     var client = new SSEClient(Networking.ServerIp, 9090);
-        //     client.OnMessage += (sender, e) =>
-        //     {
-        //         var message = JsonConvert.DeserializeObject<StreamMessage>(e.Data);
-        //         if (message.Channel == "click")
-        //         {
-        //             _clickController.Click = message;
-        //         }
-        //         else
-        //         {
-        //             var stream = _streams.Find(x => x.Channel == message.Channel);
-        //             stream.Stream = message;
-        //         }
-        //     };
-        //     client.Start();
-        // }
         private async void _sse()
         {
-            HttpClient client = new HttpClient();
-            client.Timeout = TimeSpan.FromSeconds(5);
-            string url = $"http://localhost:9090/channel-name/listen";
             while (true)
             {
                 try
                 {
-                    Debug.WriteLine("Establishing connection");
-                    using (var streamReader = new StreamReader(await client.GetStreamAsync(url)))
+                    using (var client = new HttpClient())
                     {
-                        while (!streamReader.EndOfStream)
+                        while (Networking.ServerIp == "IP Not Found")
                         {
-                            var message = await streamReader.ReadLineAsync();
-                            Debug.WriteLine($"Received: {message}");
+                            await Task.Delay(500);
+                        }
+                        using (var stream = await client.GetStreamAsync($"http://{Networking.ServerIp}:{Networking.Port}/channel-name/listen"))
+                        {
+                            using (var reader = new StreamReader(stream))
+                            {
+                                while (true)
+                                {
+                                    string line = await reader.ReadLineAsync();
+                                    line = line.Substring(6);
+                                    Debug.WriteLine($"SSE Message: {line}");
+                                    if (line.Contains("channel_name"))
+                                    {
+                                        _processChannelName(line);
+                                    } else if (line.Contains("bpm"))
+                                    {
+                                        _processBpm(line);
+                                    }
+                                }
+                            }
                         }
                     }
+
                 }
-                catch(Exception ex)
+                catch (Exception e)
                 {
-                    //Here you can check for 
-                    //specific types of errors before continuing
-                    //Since this is a simple example, i'm always going to retry
-                    Debug.WriteLine($"Error: {ex.Message}");
-                    Debug.WriteLine("Retrying in 5 seconds");
-                    await Task.Delay(TimeSpan.FromSeconds(5));
+                    Debug.WriteLine(e);
                 }
             }
+        }
+        
+        private void _processChannelName(string line)
+        {
+            // Parse line into JSON
+            var channelName = JsonConvert.DeserializeObject<JsonData>(line);
+            if (channelName == null) return;
+            Debug.WriteLine(channelName);
+            _streams[channelName.Id - 1].Stream.ChangeStreamName(channelName.ChannelName);
+        }
+        
+        private void _processBpm(string line)
+        {
+            JsonData bpm = JsonConvert.DeserializeObject<JsonData>(line);
+            if (bpm == null) return;
+            Debug.WriteLine(bpm);
+            _clickController.Click.ChangeBpm(bpm.Bpm);
         }
     }
 }
