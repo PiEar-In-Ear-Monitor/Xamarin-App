@@ -19,7 +19,7 @@ namespace PiEar.Views
     {
         private readonly ObservableCollection<StreamController> _streams = new ObservableCollection<StreamController>();
         private readonly ClickController _clickController = new ClickController();
-        private bool _globalMute = false;
+        private bool _globalMute;
         private string _clickFilename => $"PiEar.Click.{CrossSettings.Current.GetValueOrDefault("click", PiEar.Settings.Click, PiEar.Settings.File)}.ogg";
         private readonly ISimpleAudioPlayer _player = CrossSimpleAudioPlayer.Current;
         public MainPage()
@@ -27,7 +27,50 @@ namespace PiEar.Views
             InitializeComponent();
             BindingContext = _clickController;
             _setupChannels();
-            _sse();
+            Task.Run(async () =>
+                {
+                    while (true)
+                    {
+                        try
+                        {
+                            using (var client = new HttpClient())
+                            {
+                                while (Networking.ServerIp == "IP Not Found")
+                                {
+                                    await Task.Delay(500);
+                                }
+                                using (var stream = await client.GetStreamAsync($"http://{Networking.ServerIp}:{Networking.Port}/channel-name/listen"))
+                                {
+                                    using (var reader = new StreamReader(stream))
+                                    {
+                                        while (true)
+                                        {
+                                            string line = await reader.ReadLineAsync();
+                                            if (line.Length < 6)
+                                            {
+                                                continue;
+                                            }
+                                            line = line.Substring(6);
+                                            if (line.Contains("channel_name"))
+                                            {
+                                                _processChannelName(line);
+                                            } else if (line.Contains("bpm"))
+                                            {
+                                                _processBpm(line);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.WriteLine(e);
+                        }
+                    }
+                }
+            );
         }
         protected override void OnAppearing()
         {
@@ -82,56 +125,16 @@ namespace PiEar.Views
             {
                 _streams.Add(new StreamController());
             }
+            var bpm = await Networking.GetRequest("/bpm");
+            _processBpm(bpm);
             ListOfChannels.ItemsSource = null;
             ListOfChannels.ItemsSource = _streams;
         }
-        private async void _sse()
-        {
-            while (true)
-            {
-                try
-                {
-                    using (var client = new HttpClient())
-                    {
-                        while (Networking.ServerIp == "IP Not Found")
-                        {
-                            await Task.Delay(500);
-                        }
-                        using (var stream = await client.GetStreamAsync($"http://{Networking.ServerIp}:{Networking.Port}/channel-name/listen"))
-                        {
-                            using (var reader = new StreamReader(stream))
-                            {
-                                while (true)
-                                {
-                                    string line = await reader.ReadLineAsync();
-                                    line = line.Substring(6);
-                                    Debug.WriteLine($"SSE Message: {line}");
-                                    if (line.Contains("channel_name"))
-                                    {
-                                        _processChannelName(line);
-                                    } else if (line.Contains("bpm"))
-                                    {
-                                        _processBpm(line);
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                }
-                catch (Exception e)
-                {
-                    Debug.WriteLine(e);
-                }
-            }
-        }
-        
         private void _processChannelName(string line)
         {
             // Parse line into JSON
             var channelName = JsonConvert.DeserializeObject<JsonData>(line);
             if (channelName == null) return;
-            Debug.WriteLine(channelName);
             _streams[channelName.Id - 1].Stream.ChangeStreamName(channelName.ChannelName);
         }
         
@@ -139,8 +142,14 @@ namespace PiEar.Views
         {
             JsonData bpm = JsonConvert.DeserializeObject<JsonData>(line);
             if (bpm == null) return;
-            Debug.WriteLine(bpm);
-            _clickController.Click.ChangeBpm(bpm.Bpm);
+            if (line.Contains("bpm_enabled"))
+            {
+                _clickController.Click.SseToggleEnabled(bpm.BpmEnabled);
+            }
+            if (bpm.Bpm != -1)
+            {
+                _clickController.Click.ChangeBpm(bpm.Bpm);
+            }
         }
     }
 }

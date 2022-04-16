@@ -10,8 +10,8 @@ namespace PiEar.Helpers
 {
     public static class Networking
     {
-        private static bool _foundIp = false;
-        private static string _serverIp = null;
+        private static bool _foundIp;
+        private static string _serverIp;
         public static string ServerIp => (_foundIp) ? _serverIp : "IP Not Found";
         public const int Port = 9090;
         public static async Task<string> GetRequest(string endpoint, bool forDiscovery = false)
@@ -19,13 +19,13 @@ namespace PiEar.Helpers
             if (!_foundIp && !forDiscovery) return "";
             try
             {
-                Debug.WriteLine($"GET http://{_serverIp}:{Port}{endpoint}");
                 WebRequest request = WebRequest.Create ($"http://{_serverIp}:{Port}{endpoint}");
                 request.Timeout = 500;
                 return await _getResp(request);
             }
             catch (Exception e)
             {
+                Debug.WriteLine(e);
                 return "";
             }
         }
@@ -34,7 +34,6 @@ namespace PiEar.Helpers
             if (!_foundIp) return "";
             try
             {
-                Debug.WriteLine($"PUT http://{_serverIp}:{Port}{endpoint}");
                 WebRequest request = WebRequest.Create($"http://{ServerIp}:{Port}{endpoint}");
                 request.Method = "PUT";
                 request.Timeout = 500;
@@ -42,6 +41,7 @@ namespace PiEar.Helpers
             }
             catch (Exception e)
             {
+                Debug.WriteLine(e);
                 return "";
             }
         }
@@ -60,6 +60,7 @@ namespace PiEar.Helpers
             }
             catch (Exception e)
             {
+                Debug.WriteLine(e);
                 return "";
             }
         }
@@ -83,7 +84,7 @@ namespace PiEar.Helpers
                     maxSet[i] = true;
                 }
             }
-            toCheck[2] = 154; // Save a lot of time!
+            // toCheck[2] = 154; // Save a lot of time!
             while (!_foundIp)
             {
                 for (int i = 0; i < 256; i++)

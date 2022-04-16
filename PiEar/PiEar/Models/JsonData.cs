@@ -12,7 +12,9 @@ namespace PiEar.Models
         [JsonProperty("bpm")] public int Bpm { get; set; } = -1;
         [JsonProperty("channel_count")]
         public int ChannelCount { get; set; }
-        [JsonProperty("id")]
+        [JsonProperty("piear_id")]
         public int Id { get; set; }
+        [JsonProperty("bpm_enabled")]
+        public bool BpmEnabled { get; set; }
     }
 }
