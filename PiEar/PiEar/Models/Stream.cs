@@ -14,25 +14,18 @@ namespace PiEar.Models
     {
         private static int _count;
         private string Id { get; } = _count++.ToString();
+        private string _label;
         public string Label
         {
-            get
-            {
-                var resp = Task.Run(async () => await Networking.GetRequest($"/channel-name?id={this.Id}"));
-                resp.Wait();
-                Debug.WriteLine(resp.Result);
-                var channel = JsonConvert.DeserializeObject<JsonData>(resp.Result);
-                if (channel != null && channel.Error == null)
-                {
-                    Debug.WriteLine(channel.Channel);
-                    return channel.Channel;
-                }
-                return "";
-            }
+            get => _label;
             set
             {
-                var resp = Task.Run(async () => await Networking.PutRequest($"/channel-name?id={this.Id}&name={value}"));
-                resp.Wait();
+                if (value != "%%RENAME_DONE_ALREADY%%")
+                {
+                    var resp = Task.Run(async () => await Networking.PutRequest($"/channel-name?id={this.Id}&name={value}"));
+                    resp.Wait();
+                    _label = value;
+                }
                 OnPropertyChanged();
             }
         }
@@ -63,16 +56,27 @@ namespace PiEar.Models
                 OnPropertyChanged();
             }
         }
-        public Stream(string label) { Label = label; }
-        public Stream() {}
-        protected class JsonData
+
+        public Stream()
         {
-            [JsonProperty("channel_name")]
-            public string Channel { get; set; }
-            [JsonProperty("error")]
-            public string Error { get; set; }
-            [JsonProperty("bpm ")]
-            public int Bpm { get; set; }
+            var resp = Task.Run(async () => await Networking.GetRequest($"/channel-name?id={Id}"));
+            resp.Wait();
+            Debug.WriteLine(resp.Result);
+            var channel = JsonConvert.DeserializeObject<JsonData>(resp.Result);
+            if (channel != null && channel.Error == null)
+            {
+                Debug.WriteLine(channel.ChannelName);
+                _label = channel.ChannelName;
+            }
+            else
+            {
+                _label = "";
+            }
+        }
+        public void ChangeStreamName(string label)
+        {
+            _label = label;
+            Label = "%%RENAME_DONE_ALREADY%%";
         }
         public event PropertyChangedEventHandler PropertyChanged;
         [NotifyPropertyChangedInvocator]

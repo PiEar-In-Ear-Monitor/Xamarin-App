@@ -10,63 +10,57 @@ namespace PiEar.Helpers
 {
     public static class Networking
     {
-        private static bool _foundIp = false;
-        private static string _serverIp = null;
-
+        private static bool _foundIp;
+        private static string _serverIp;
         public static string ServerIp => (_foundIp) ? _serverIp : "IP Not Found";
-        private const int Port = 9090;
+        public const int Port = 9090;
         public static async Task<string> GetRequest(string endpoint, bool forDiscovery = false)
         {
-            Debug.WriteLine($"Getting {endpoint}");
-            if (ServerIp == "IP Not Found" && !forDiscovery)
-            {
-                return "";
-            }
+            if (!_foundIp && !forDiscovery) return "";
             try
             {
                 WebRequest request = WebRequest.Create ($"http://{_serverIp}:{Port}{endpoint}");
                 request.Timeout = 500;
-                HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
+                return await _getResp(request);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return "";
+            }
+        }
+        public static async Task<string> PutRequest(string endpoint)
+        {
+            if (!_foundIp) return "";
+            try
+            {
+                WebRequest request = WebRequest.Create($"http://{ServerIp}:{Port}{endpoint}");
+                request.Method = "PUT";
+                request.Timeout = 500;
+                return await _getResp(request);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return "";
+            }
+        }
+        private static async Task<string> _getResp(WebRequest req)
+        {
+            try
+            {
+                HttpWebResponse response = (HttpWebResponse)await req.GetResponseAsync();
                 Stream dataStream = response.GetResponseStream();
-                StreamReader reader = new StreamReader(dataStream);
+                StreamReader reader = new StreamReader(dataStream ?? throw new InvalidOperationException());
                 string responseFromServer = await reader.ReadToEndAsync();
-                reader.Close ();
-                dataStream.Close ();
-                response.Close ();
+                reader.Close();
+                dataStream.Close();
+                response.Close();
                 return responseFromServer;
             }
             catch (Exception e)
             {
-                return "";
-            }
-            return "";
-        }
-        public static async Task<string> PutRequest(string endpoint)
-        {
-            if (ServerIp == "IP Not Found")
-            {
-                return "";
-            }
-            try
-            {
-                WebRequest request = WebRequest.Create ($"http://{ServerIp}:{Port}{endpoint}");
-                request.Method = "PUT";
-                request.Timeout = 500;
-                HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync();
-                Stream dataStream = response.GetResponseStream();
-                if (dataStream != null)
-                {
-                    StreamReader reader = new StreamReader(dataStream);
-                    string responseFromServer = await reader.ReadToEndAsync();
-                    reader.Close();
-                    dataStream.Close();
-                    response.Close();
-                    return responseFromServer;
-                }
-                return "";
-            }
-            catch (Exception e)
-            {
+                Debug.WriteLine(e);
                 return "";
             }
         }

@@ -1,47 +1,36 @@
-using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using PiEar.Helpers;
 
 namespace PiEar.Models
 {
     public class Click : Stream
     {
-        private bool _enabled = false;
+        private bool _toggled;
         private int _stepCount = 10;
+        private int _bpm = -1;
         public int Bpm
         {
-            get
-            {   
-                var resp = Task.Run(async () => await Networking.GetRequest($"/bpm"));
-                resp.Wait();
-                Debug.WriteLine(resp.Result);
-                var channel = JsonConvert.DeserializeObject<JsonData>(resp.Result);
-                if (channel != null && channel.Error == null)
-                {
-                    Debug.WriteLine(channel.Bpm);
-                    return channel.Bpm;
-                }
-                return 0;
-            } 
+            get => _bpm;
             set
             {
-                if (value is int)
+                if (value != -1)
                 {
-                    var resp = Task.Run(async () => await Networking.PutRequest($"/bpm/{value}"));
+                    var resp = Task.Run(async () => await Networking.PutRequest($"/bpm?bpm={value}"));
                     resp.Wait();
                 }
                 OnPropertyChanged();
             }
         }
-        public bool Enabled
+        public bool Toggled
         {
-            get => _enabled; // TODO Get from stream
+            get => _toggled;
             set
             {
-                _enabled = !_enabled; // TODO Get from stream
+                Debug.WriteLine($"Enabled: {value}");
+                var resp = Task.Run(async () => await Networking.PutRequest($"/bpm?bpmEnabled={(value)}"));
+                resp.Wait();
+                _toggled = value;
                 OnPropertyChanged();
             }
         }
@@ -54,9 +43,16 @@ namespace PiEar.Models
                 OnPropertyChanged();
             }
         }
-        public void ChangeBpm()
+        public void ChangeBpm(int bpm)
         {
-            OnPropertyChanged(nameof(Bpm));
+            _bpm = bpm;
+            Bpm = -1;
+        }
+        public void SseToggleEnabled(bool enable)
+        {
+            Debug.WriteLine($"SSE Enabled: {enable}");
+            _toggled = enable;
+            OnPropertyChanged(nameof(Toggled));
         }
     }
 }
