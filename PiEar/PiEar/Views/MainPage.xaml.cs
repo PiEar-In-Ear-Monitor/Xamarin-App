@@ -26,7 +26,6 @@ namespace PiEar.Views
         {
             InitializeComponent();
             BindingContext = _clickController;
-            _setupChannels();
             Task.Run(async () =>
                 {
                     while (true)
@@ -45,8 +44,10 @@ namespace PiEar.Views
                                     {
                                         while (true)
                                         {
-                                            string line = await reader.ReadLineAsync();
-                                            if (line.Length < 6)
+                                            string line = null;
+                                            line = await reader.ReadLineAsync();
+                                            Debug.WriteLine($"Read {line}");
+                                            if (line == null || line.Length < 6)
                                             {
                                                 continue;
                                             }
@@ -71,6 +72,7 @@ namespace PiEar.Views
                     }
                 }
             );
+            _setupChannels();
         }
         protected override void OnAppearing()
         {
@@ -135,7 +137,7 @@ namespace PiEar.Views
             // Parse line into JSON
             var channelName = JsonConvert.DeserializeObject<JsonData>(line);
             if (channelName == null) return;
-            _streams[channelName.Id - 1].Stream.ChangeStreamName(channelName.ChannelName);
+            _streams[channelName.Id - 1].Stream.Label = channelName.ChannelName;
         }
         
         private void _processBpm(string line)
@@ -144,11 +146,11 @@ namespace PiEar.Views
             if (bpm == null) return;
             if (line.Contains("bpm_enabled"))
             {
-                _clickController.Click.SseToggleEnabled(bpm.BpmEnabled);
+                _clickController.Click.Toggled = bpm.BpmEnabled;
             }
             if (bpm.Bpm != -1)
             {
-                _clickController.Click.ChangeBpm(bpm.Bpm);
+                _clickController.Click.Bpm = bpm.Bpm;
             }
         }
     }

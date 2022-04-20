@@ -27,7 +27,7 @@ namespace PiEar.ViewModels
                 {
                     return;
                 }
-                Stream.Label = ((newLabel.Length > 26 ) ? newLabel.Substring(0, 26) : newLabel );
+                Stream.Label = ((newLabel.Length > 26 ) ? newLabel.Substring(0, 26) : newLabel ).Replace(" ", "_");
             }
             catch (Exception ex)
             {

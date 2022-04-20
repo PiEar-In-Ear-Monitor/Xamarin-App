@@ -13,25 +13,30 @@ namespace PiEar.Models
 
         public void MainLoop()
         {
-            try
+            while (true)
             {
-                while (Networking.ServerIp == "IP not found")
+                try
                 {
-                    Console.WriteLine("Waiting for IP...");
-                    Task.Delay(1000).Wait();
-                }
-                var udpClient = new UdpClient(Networking.ServerIp, Networking.Port);
-                var ipEndPoint = new IPEndPoint(IPAddress.Any, 0);
+                    while (Networking.ServerIp == "IP not found")
+                    {
+                        Console.WriteLine("Waiting for IP...");
+                        Task.Delay(1000).Wait();
+                    }
 
-                while (true)
-                {
-                    var data = udpClient.Receive(ref ipEndPoint);
-                    var message = Encoding.UTF8.GetString(data);
-                    Debug.WriteLine(message);
+                    var udpClient = new UdpClient(Networking.ServerIp, Networking.Port);
+                    var ipEndPoint = new IPEndPoint(IPAddress.Any, 0);
+
+                    while (true)
+                    {
+                        var data = udpClient.Receive(ref ipEndPoint);
+                        var message = Encoding.UTF8.GetString(data);
+                        Debug.WriteLine(message);
+                    }
                 }
-            } catch (Exception e)
-            {
-                Debug.WriteLine(e);
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e);
+                }
             }
         }
     }

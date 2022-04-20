@@ -17,16 +17,22 @@ namespace PiEar.Models
         private string _label;
         public string Label
         {
-            get => _label;
+            get => _label.Replace("_", " ");
             set
             {
-                if (value != "%%RENAME_DONE_ALREADY%%")
+                var resp = Task.Run(async () => await Networking.PutRequest($"/channel-name?id={this.Id}&name={value}"));
+                resp.Wait();
+                // Parse response as JSON
+                var json = JsonConvert.DeserializeObject<JsonData>(resp.Result);
+                if (json == null || json.Error != null)
                 {
-                    var resp = Task.Run(async () => await Networking.PutRequest($"/channel-name?id={this.Id}&name={value}"));
-                    resp.Wait();
-                    _label = value;
+                    Debug.WriteLine(json?.Error);
                 }
-                OnPropertyChanged();
+                else
+                {
+                    _label = json.ChannelName;
+                    OnPropertyChanged();
+                }
             }
         }
         public bool Mute
@@ -61,11 +67,9 @@ namespace PiEar.Models
         {
             var resp = Task.Run(async () => await Networking.GetRequest($"/channel-name?id={Id}"));
             resp.Wait();
-            Debug.WriteLine(resp.Result);
             var channel = JsonConvert.DeserializeObject<JsonData>(resp.Result);
             if (channel != null && channel.Error == null)
             {
-                Debug.WriteLine(channel.ChannelName);
                 _label = channel.ChannelName;
             }
             else
@@ -73,16 +77,10 @@ namespace PiEar.Models
                 _label = "";
             }
         }
-        public void ChangeStreamName(string label)
-        {
-            _label = label;
-            Label = "%%RENAME_DONE_ALREADY%%";
-        }
         public event PropertyChangedEventHandler PropertyChanged;
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            Debug.WriteLine(propertyName);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
