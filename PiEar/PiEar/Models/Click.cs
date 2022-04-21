@@ -48,6 +48,16 @@ namespace PiEar.Models
                     OnPropertyChanged();
                 }
             }
+        }        
+        public void ChangeToggle(bool value)
+        {
+            _toggled = value;
+            OnPropertyChanged(nameof(Toggled));
+        }
+        public void ChangeBpm(int value)
+        {
+            _bpm = value;
+            OnPropertyChanged(nameof(Bpm));
         }
         public int StepCount
         {

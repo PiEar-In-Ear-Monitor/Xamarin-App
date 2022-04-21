@@ -76,7 +76,13 @@ namespace PiEar.Models
             {
                 _label = "";
             }
+        }        
+        public void ChangeLabel(string value)
+        {
+            _label = value;
+            OnPropertyChanged(nameof(Label));
         }
+
         public event PropertyChangedEventHandler PropertyChanged;
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
