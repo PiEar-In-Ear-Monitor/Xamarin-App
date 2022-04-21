@@ -18,14 +18,14 @@ namespace PiEar.Views
     public partial class MainPage
     {
         private readonly ObservableCollection<StreamController> _streams = new ObservableCollection<StreamController>();
-        private readonly ClickController _clickController = new ClickController();
+        public static readonly ClickController ClickController = new ClickController();
         private bool _globalMute;
         private string _clickFilename => $"PiEar.Click.{CrossSettings.Current.GetValueOrDefault("click", PiEar.Settings.Click, PiEar.Settings.File)}.ogg";
         private readonly ISimpleAudioPlayer _player = CrossSimpleAudioPlayer.Current;
         public MainPage()
         {
             InitializeComponent();
-            BindingContext = _clickController;
+            BindingContext = ClickController;
             Task.Run(async () =>
                 {
                     while (Networking.ServerIp == "IP Not Found")
@@ -60,11 +60,11 @@ namespace PiEar.Views
                                             }
                                             if (line.Contains("bpm_enabled"))
                                             {
-                                                _clickController.Click.ChangeToggle(json.BpmEnabled);
+                                                ClickController.Click.ChangeToggle(json.BpmEnabled);
                                             }
                                             if (line.Contains("bpm") && !line.Contains("bpm_enabled"))
                                             {
-                                                _clickController.Click.ChangeBpm(json.Bpm);
+                                                ClickController.Click.ChangeBpm(json.Bpm);
                                             }
                                         }
                                     }
@@ -84,7 +84,7 @@ namespace PiEar.Views
         {
             ListOfChannels.ItemsSource = null;
             ListOfChannels.ItemsSource = _streams;
-            _clickController.Rotation = _clickController.Rotation;
+            ClickController.Rotation = ClickController.Rotation;
             _player.Load(typeof(App).GetTypeInfo().Assembly.GetManifestResourceStream(_clickFilename));
         }
         private async void _openSettings(object sender, EventArgs e)
@@ -99,14 +99,14 @@ namespace PiEar.Views
         {
             if (e.StatusType == GestureStatus.Running)
             {
-                _clickController.Rotation += e.TotalX / 2.0;
+                ClickController.Rotation += e.TotalX / 2.0;
             }
-            if (_clickController.Rotation > 130)
+            if (ClickController.Rotation > 130)
             {
-                _clickController.Rotation = 130;
-            } else if (_clickController.Rotation < -130)
+                ClickController.Rotation = 130;
+            } else if (ClickController.Rotation < -130)
             {
-                _clickController.Rotation = -130;
+                ClickController.Rotation = -130;
             }
         }
         private void _muteAudio(object sender, EventArgs e)
@@ -116,7 +116,7 @@ namespace PiEar.Views
         }
         private void _pressForSound(object sender, EventArgs e)
         {
-            _player.Volume = _clickController.Click.Volume;
+            _player.Volume = ClickController.Click.Volume;
             _player.Play();
         }
         private async void _setupChannels(){
@@ -146,8 +146,8 @@ namespace PiEar.Views
             {
                 if (json.Bpm != -1)
                 {
-                    _clickController.Click.ChangeBpm(json.Bpm);
-                    _clickController.Click.ChangeToggle(json.BpmEnabled);
+                    ClickController.Click.ChangeBpm(json.Bpm);
+                    ClickController.Click.ChangeToggle(json.BpmEnabled);
                 }
             }
             ListOfChannels.ItemsSource = null;

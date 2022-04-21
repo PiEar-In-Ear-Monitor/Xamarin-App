@@ -12,9 +12,7 @@
             <Label x:Name="License"
                    VerticalOptions="StartAndExpand"
                    HorizontalOptions="CenterAndExpand" />
-            <Label x:Name="Server"/>
-            <Label x:Name="Gateway"/>
-            <Label x:Name="Address"/>
+            <ListView x:Name="MulticastReceived"/>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>
