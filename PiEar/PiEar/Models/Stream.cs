@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using PiEar.Annotations;
@@ -22,7 +23,7 @@ namespace PiEar.Models
             {
                 if (value != "%%RENAME_DONE_ALREADY%%")
                 {
-                    var resp = Task.Run(async () => await Networking.PutRequest($"/channel-name?id={this.Id}&name={value}"));
+                    var resp = Task.Run(async () => await Networking.PutRequest($"/channel-name?id={this.Id}&name={_toBase64(value)}"));
                     resp.Wait();
                     _label = value;
                 }
@@ -56,7 +57,6 @@ namespace PiEar.Models
                 OnPropertyChanged();
             }
         }
-
         public Stream()
         {
             var resp = Task.Run(async () => await Networking.GetRequest($"/channel-name?id={Id}"));
@@ -65,6 +65,7 @@ namespace PiEar.Models
             var channel = JsonConvert.DeserializeObject<JsonData>(resp.Result);
             if (channel != null && channel.Error == null)
             {
+                channel.ChannelName = _fromBase64(channel.ChannelName);
                 Debug.WriteLine(channel.ChannelName);
                 _label = channel.ChannelName;
             }
@@ -85,5 +86,7 @@ namespace PiEar.Models
             Debug.WriteLine(propertyName);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+        private string _toBase64(string data) => Convert.ToBase64String(Encoding.UTF8.GetBytes(data));
+        private string _fromBase64(string data) => Encoding.UTF8.GetString(Convert.FromBase64String(data));
     }
 }

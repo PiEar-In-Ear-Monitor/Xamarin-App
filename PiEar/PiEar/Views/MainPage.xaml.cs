@@ -137,7 +137,6 @@ namespace PiEar.Views
             if (channelName == null) return;
             _streams[channelName.Id - 1].Stream.ChangeStreamName(channelName.ChannelName);
         }
-        
         private void _processBpm(string line)
         {
             JsonData bpm = JsonConvert.DeserializeObject<JsonData>(line);
