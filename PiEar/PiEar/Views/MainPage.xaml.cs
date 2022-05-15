@@ -26,43 +26,50 @@ namespace PiEar.Views
         {
             InitializeComponent();
             BindingContext = _clickController;
-            _setupChannels();
             Task.Run(async () =>
                 {
+                    while (Networking.ServerIp == "IP Not Found")
+                    {
+                        await Task.Delay(500);
+                    }
                     while (true)
                     {
                         try
                         {
                             using (var client = new HttpClient())
                             {
-                                while (Networking.ServerIp == "IP Not Found")
-                                {
-                                    await Task.Delay(500);
-                                }
                                 using (var stream = await client.GetStreamAsync($"http://{Networking.ServerIp}:{Networking.Port}/channel-name/listen"))
                                 {
                                     using (var reader = new StreamReader(stream))
                                     {
                                         while (true)
-                                        {
-                                            string line = await reader.ReadLineAsync();
-                                            if (line.Length < 6)
+                                        { 
+                                            string line = reader.ReadLine();
+                                            if (line == null || line.Length < 6)
                                             {
                                                 continue;
                                             }
                                             line = line.Substring(6);
-                                            if (line.Contains("channel_name"))
+                                            JsonData json = JsonConvert.DeserializeObject<JsonData>(line);
+                                            if (json == null)
                                             {
-                                                _processChannelName(line);
-                                            } else if (line.Contains("bpm"))
+                                                continue;
+                                            }
+                                            if (line.Contains("channel_name")) {
+                                                _streams[json.Id - 1].Stream.ChangeLabel(json.ChannelName);
+                                            }
+                                            if (line.Contains("bpm_enabled"))
                                             {
-                                                _processBpm(line);
+                                                _clickController.Click.ChangeToggle(json.BpmEnabled);
+                                            }
+                                            if (line.Contains("bpm") && !line.Contains("bpm_enabled"))
+                                            {
+                                                _clickController.Click.ChangeBpm(json.Bpm);
                                             }
                                         }
                                     }
                                 }
                             }
-
                         }
                         catch (Exception e)
                         {
@@ -71,6 +78,7 @@ namespace PiEar.Views
                     }
                 }
             );
+            _setupChannels();
         }
         protected override void OnAppearing()
         {
@@ -106,49 +114,44 @@ namespace PiEar.Views
             _globalMute = !_globalMute;
             GlobalMuteIcon.IconImageSource = (_globalMute) ? "mute" : "unmute";
         }
-
         private void _pressForSound(object sender, EventArgs e)
         {
             _player.Volume = _clickController.Click.Volume;
             _player.Play();
         }
-        private async void _setupChannels()
-        {
+        private async void _setupChannels(){
             while(Networking.ServerIp == "IP Not Found")
             {
                 await Task.Delay(500);
             }
-            var channelCount = await Networking.GetRequest("/channel-name");
-            channelCount = channelCount.Replace("{\"channel_count\":", "");
-            channelCount = channelCount.Replace("}", "");
-            for (int i = 0; i < int.Parse(channelCount) - 1; i++)
+            string resp = await Networking.GetRequest("/channel-name");
+            JsonData json;
+            if (resp != null)
             {
-                _streams.Add(new StreamController());
+                json = JsonConvert.DeserializeObject<JsonData>(resp);
+                if (json != null)
+                {
+                    if (json.ChannelCount != -1)
+                    {
+                        for (int i = 0; i < json.ChannelCount - 1; i++)
+                        {
+                            _streams.Add(new StreamController());
+                        }
+                    }
+                }
             }
-            var bpm = await Networking.GetRequest("/bpm");
-            _processBpm(bpm);
+            resp = await Networking.GetRequest("/bpm");
+            json = JsonConvert.DeserializeObject<JsonData>(resp);
+            if (json != null)
+            {
+                if (json.Bpm != -1)
+                {
+                    _clickController.Click.ChangeBpm(json.Bpm);
+                    _clickController.Click.ChangeToggle(json.BpmEnabled);
+                }
+            }
             ListOfChannels.ItemsSource = null;
             ListOfChannels.ItemsSource = _streams;
-        }
-        private void _processChannelName(string line)
-        {
-            // Parse line into JSON
-            var channelName = JsonConvert.DeserializeObject<JsonData>(line);
-            if (channelName == null) return;
-            _streams[channelName.Id - 1].Stream.ChangeStreamName(channelName.ChannelName);
-        }
-        private void _processBpm(string line)
-        {
-            JsonData bpm = JsonConvert.DeserializeObject<JsonData>(line);
-            if (bpm == null) return;
-            if (line.Contains("bpm_enabled"))
-            {
-                _clickController.Click.SseToggleEnabled(bpm.BpmEnabled);
-            }
-            if (bpm.Bpm != -1)
-            {
-                _clickController.Click.ChangeBpm(bpm.Bpm);
-            }
         }
     }
 }

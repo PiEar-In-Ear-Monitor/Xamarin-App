@@ -21,12 +21,9 @@ namespace PiEar.Models
             get => _label;
             set
             {
-                if (value != "%%RENAME_DONE_ALREADY%%")
-                {
-                    var resp = Task.Run(async () => await Networking.PutRequest($"/channel-name?id={this.Id}&name={_toBase64(value)}"));
-                    resp.Wait();
-                    _label = value;
-                }
+                var resp = Task.Run(async () => await Networking.PutRequest($"/channel-name?id={this.Id}&name={_toBase64(value)}"));
+                resp.Wait();
+                _label = value;
                 OnPropertyChanged();
             }
         }
@@ -61,7 +58,6 @@ namespace PiEar.Models
         {
             var resp = Task.Run(async () => await Networking.GetRequest($"/channel-name?id={Id}"));
             resp.Wait();
-            Debug.WriteLine(resp.Result);
             var channel = JsonConvert.DeserializeObject<JsonData>(resp.Result);
             if (channel != null && channel.Error == null)
             {
@@ -73,17 +69,25 @@ namespace PiEar.Models
             {
                 _label = "";
             }
-        }
-        public void ChangeStreamName(string label)
+        }        
+        public void ChangeLabel(string value)
         {
-            _label = label;
-            Label = "%%RENAME_DONE_ALREADY%%";
+            string converted = null;
+            try
+            {
+                converted = _fromBase64(value);
+            } catch (Exception e)
+            {
+                Debug.WriteLine($"Trouble converting {value} to base64: {e.Message}");
+            }
+            _label = converted;
+            OnPropertyChanged(nameof(Label));
         }
+
         public event PropertyChangedEventHandler PropertyChanged;
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            Debug.WriteLine(propertyName);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
         private string _toBase64(string data) => Convert.ToBase64String(Encoding.UTF8.GetBytes(data));
