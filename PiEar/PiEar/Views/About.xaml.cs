@@ -9,12 +9,14 @@ using Xamarin.Forms;
 using PiEar.Helpers;
 using PiEar.Interfaces;
 using PiEar.Models;
+using Xamarin.Forms.Internals;
 
 namespace PiEar.Views
 {
     public partial class About
     {
         private readonly ObservableCollection<string> _receivedMessages = new ObservableCollection<string>();
+        private Multicast _multicast;
         public About()
         {
             InitializeComponent();
@@ -34,38 +36,16 @@ THE SOFTWARE IS PROVIDED ""AS IS"", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMP
             // Get instance of IMulticastService
             var service = DependencyService.Get<IMulticastLock>();
             service.Acquire();
-            Task.Run(async () =>
+            Task.Run(() =>
             {
-                while (true)
+                _multicast = new Multicast(IPAddress.Parse("224.0.0.69"), 6666);
+                _multicast.UdpMessageReceived += (sender, args) =>
                 {
-                    try
+                    Device.BeginInvokeOnMainThread(() =>
                     {
-                        while (Networking.ServerIp == "IP not found")
-                        {
-                            Debug.WriteLine("Waiting for IP...");
-                            Task.Delay(1000).Wait();
-                        }
-                        var endpoint = new IPEndPoint(IPAddress.Parse(Multicast.MulticastAddress), Multicast.Port);
-                        var multicast = new UdpClient(endpoint);
-                        while (true)
-                        {
-                            // var multicastBytes = multicast.Receive(ref endpoint);
-                            var multicastBytes = await multicast.ReceiveAsync();
-                            Debug.WriteLine(multicastBytes.RemoteEndPoint.ToString());
-                            // var message = Encoding.UTF8.GetString(multicastBytes);
-                            var message = Encoding.UTF8.GetString(Multicast.Uncompress(multicastBytes.Buffer));
-                            Debug.WriteLine($"Received: {message}");
-                            Device.BeginInvokeOnMainThread(() =>
-                            {
-                                _receivedMessages.Add(message);
-                            });
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.WriteLine(e);
-                    }
-                }
+                        _receivedMessages.Insert(0, Encoding.UTF8.GetString(args.Buffer));
+                    });
+                };
             });
         }
     }
