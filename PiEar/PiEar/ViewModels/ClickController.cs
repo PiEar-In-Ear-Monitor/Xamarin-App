@@ -11,8 +11,8 @@ namespace PiEar.ViewModels
 {
     public sealed class ClickController: INotifyPropertyChanged
     {
-        private readonly int _minimum;
-        private readonly int _maximum = 360;
+        private const int Minimum = 0;
+        private const int Maximum = 999;
         public Click Click { get; } = new Click();
         public ICommand StepperTap { get; }
         public ICommand ChangeBpm { get; }
@@ -29,7 +29,6 @@ namespace PiEar.ViewModels
         }
         public ClickController()
         {
-            _minimum = 0;
             ChangeBpm = new Command(_changeBpm);
             StepperTap = new Command(_stepperTap);
             MinusStepper = new Command(_minusStepper);
@@ -56,7 +55,7 @@ namespace PiEar.ViewModels
             try
             {
                 int intBpm = int.Parse(newBpm);
-                if (intBpm <= _maximum && intBpm >= _minimum)
+                if (intBpm <= Maximum && intBpm >= Minimum)
                 {
                     Click.Bpm = intBpm;
                 }
@@ -69,17 +68,17 @@ namespace PiEar.ViewModels
         private void _minusStepper()
         {
             Click.Bpm -= Click.StepCount;
-            if (Click.Bpm < _minimum)
+            if (Click.Bpm < Minimum)
             {
-                Click.Bpm = _minimum;
+                Click.Bpm = Minimum;
             }
         }
         private void _plusStepper()
         {
             Click.Bpm += Click.StepCount;
-            if (Click.Bpm > _maximum)
+            if (Click.Bpm > Maximum)
             {
-                Click.Bpm = _maximum;
+                Click.Bpm = Maximum;
             }
         }
         public event PropertyChangedEventHandler PropertyChanged;
