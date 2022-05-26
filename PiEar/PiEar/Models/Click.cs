@@ -68,5 +68,11 @@ namespace PiEar.Models
                 OnPropertyChanged();
             }
         }
+        public void SseToggleEnabled(bool enable)
+        {
+            Debug.WriteLine($"SSE Enabled: {enable}");
+            _toggled = enable;
+            OnPropertyChanged(nameof(Toggled));
+        }
     }
 }

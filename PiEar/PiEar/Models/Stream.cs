@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using PiEar.Annotations;
@@ -20,19 +21,10 @@ namespace PiEar.Models
             get => _label.Replace("_", " ");
             set
             {
-                var resp = Task.Run(async () => await Networking.PutRequest($"/channel-name?id={this.Id}&name={value}"));
+                var resp = Task.Run(async () => await Networking.PutRequest($"/channel-name?id={this.Id}&name={_toBase64(value)}"));
                 resp.Wait();
-                // Parse response as JSON
-                var json = JsonConvert.DeserializeObject<JsonData>(resp.Result);
-                if (json == null || json.Error != null)
-                {
-                    Debug.WriteLine(json?.Error);
-                }
-                else
-                {
-                    _label = json.ChannelName;
-                    OnPropertyChanged();
-                }
+                _label = value;
+                OnPropertyChanged();
             }
         }
         public bool Mute
@@ -62,7 +54,6 @@ namespace PiEar.Models
                 OnPropertyChanged();
             }
         }
-
         public Stream()
         {
             var resp = Task.Run(async () => await Networking.GetRequest($"/channel-name?id={Id}"));
@@ -70,6 +61,8 @@ namespace PiEar.Models
             var channel = JsonConvert.DeserializeObject<JsonData>(resp.Result);
             if (channel != null && channel.Error == null)
             {
+                channel.ChannelName = _fromBase64(channel.ChannelName);
+                Debug.WriteLine(channel.ChannelName);
                 _label = channel.ChannelName;
             }
             else
@@ -79,7 +72,15 @@ namespace PiEar.Models
         }        
         public void ChangeLabel(string value)
         {
-            _label = value;
+            string converted = null;
+            try
+            {
+                converted = _fromBase64(value);
+            } catch (Exception e)
+            {
+                Debug.WriteLine($"Trouble converting {value} to base64: {e.Message}");
+            }
+            _label = converted;
             OnPropertyChanged(nameof(Label));
         }
 
@@ -89,5 +90,7 @@ namespace PiEar.Models
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+        private string _toBase64(string data) => Convert.ToBase64String(Encoding.UTF8.GetBytes(data));
+        private string _fromBase64(string data) => Encoding.UTF8.GetString(Convert.FromBase64String(data));
     }
 }
