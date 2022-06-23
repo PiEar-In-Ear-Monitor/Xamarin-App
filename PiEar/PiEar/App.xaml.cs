@@ -1,7 +1,8 @@
-﻿using System.Collections.ObjectModel;
-using PiEar.Helpers;
+﻿using PiEar.Helpers;
+using PiEar.Interfaces;
 using PiEar.Views;
 using Xamarin.Forms;
+using PiEar.ViewModels;
 using Xamarin.Forms.Xaml;
 
 [assembly: XamlCompilation(XamlCompilationOptions.Compile)]
@@ -12,12 +13,16 @@ namespace PiEar
         public App()
         {
             InitializeComponent();
-            this.MainPage = new NavigationPage(new MainPage());
+            MainPage = new NavigationPage(new MainPage());
+            
+            // Get instance of IMulticastService
+            var service = DependencyService.Get<IMulticastLock>();
+            service.Acquire();
+            Networking.FindServerIp();
         }
         protected override void OnStart()
-        {            
+        {
             // Handle when your app starts
-            Networking.FindServerIp();
         }
         protected override void OnSleep()
         {

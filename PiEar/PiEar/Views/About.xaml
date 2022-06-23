@@ -12,7 +12,6 @@
             <Label x:Name="License"
                    VerticalOptions="StartAndExpand"
                    HorizontalOptions="CenterAndExpand" />
-            <ListView x:Name="MulticastReceived"/>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

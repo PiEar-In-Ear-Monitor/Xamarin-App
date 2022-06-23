@@ -1,22 +1,16 @@
-using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Net;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
-using Xamarin.Forms;
 using PiEar.Helpers;
-using PiEar.Interfaces;
+using Xamarin.Forms;
 using PiEar.Models;
-using Xamarin.Forms.Internals;
 
 namespace PiEar.Views
 {
     public partial class About
     {
-        private readonly ObservableCollection<string> _receivedMessages = new ObservableCollection<string>();
-        private Multicast _multicast;
         public About()
         {
             InitializeComponent();
@@ -32,21 +26,6 @@ THE SOFTWARE IS PROVIDED ""AS IS"", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMP
         }
         protected override void OnAppearing()
         {
-            MulticastReceived.ItemsSource = _receivedMessages;
-            // Get instance of IMulticastService
-            var service = DependencyService.Get<IMulticastLock>();
-            service.Acquire();
-            Task.Run(() =>
-            {
-                _multicast = new Multicast(IPAddress.Parse("224.0.0.69"), 6666);
-                _multicast.UdpMessageReceived += (sender, args) =>
-                {
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        _receivedMessages.Insert(0, Encoding.UTF8.GetString(args.Buffer));
-                    });
-                };
-            });
         }
     }
 }

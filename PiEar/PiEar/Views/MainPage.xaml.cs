@@ -78,6 +78,7 @@ namespace PiEar.Views
                     }
                 }
             );
+            Globals.ClickEventReceived += _pressForSound; 
             _setupChannels();
         }
         protected override void OnAppearing()

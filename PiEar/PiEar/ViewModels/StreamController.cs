@@ -1,8 +1,6 @@
 using System;
 using System.Diagnostics;
 using System.Windows.Input;
-using Newtonsoft.Json;
-using PiEar.Helpers;
 using PiEar.Models;
 using Xamarin.Forms;
 

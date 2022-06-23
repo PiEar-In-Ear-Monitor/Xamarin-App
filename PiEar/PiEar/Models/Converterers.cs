@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using Xamarin.Forms;
 
@@ -8,7 +9,8 @@ namespace PiEar.Models
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return !((bool)value);
+            Debug.WriteLine($"Value: {value}, converted value: {!(bool)value}");
+            return !(bool) value;
         }
     
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
