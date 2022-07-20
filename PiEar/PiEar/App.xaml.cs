@@ -1,8 +1,11 @@
 ﻿using PiEar.Helpers;
 using PiEar.Interfaces;
 using PiEar.Views;
+using PiEar.ViewModels;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using PiEar.Models;
+using System.Threading.Tasks;
 
 [assembly: XamlCompilation(XamlCompilationOptions.Compile)]
 namespace PiEar
@@ -10,15 +13,31 @@ namespace PiEar
     public partial class App
     {
         public static ILog Logger = DependencyService.Get<ILog>();
+        public static bool GlobalMuteStatusValid { get; set; }
+        private static bool _globalMuteStatus;
+        public static bool GlobalMuteStatus { get => _globalMuteStatus; }
         public App()
         {
             InitializeComponent();
+            GlobalMuteName.PropertyChanged += (sender, e) => { if (e.PropertyName == "Mute") { _globalMuteStatus = GlobalMuteName.Mute; } };
+            GlobalMuteStatusValid = true;
             MainPage = new NavigationPage(new MainView());
-            
-            // Get instance of IMulticastService
+
+            Task.Run(
+                () => {
+                    while (true)
+                    {
+                        while (GlobalMuteStatusValid) ;
+                        GlobalMuteName.Mute = !GlobalMuteStatus;
+                        GlobalMuteStatusValid = true;
+                        Logger.InfoWrite($"GlobalMuteStatus is now {GlobalMuteStatus}");
+                    }
+                }
+            );
             var service = DependencyService.Get<IMulticastLock>();
             service.Acquire();
             Networking.FindServerIp();
+            BackgroundTasks.ClickEventReceived += ClickViewModel.HandleClickReceived;
         }
         protected override void OnStart()
         {

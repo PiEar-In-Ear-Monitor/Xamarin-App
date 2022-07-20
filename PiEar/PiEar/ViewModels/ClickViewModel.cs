@@ -7,6 +7,7 @@ using System.Windows.Input;
 using PiEar.Annotations;
 using PiEar.Helpers;
 using PiEar.Models;
+using PiEar.Views;
 using Xamarin.Forms;
 
 namespace PiEar.ViewModels
@@ -16,19 +17,11 @@ namespace PiEar.ViewModels
         private const int Minimum = 0;
         private const int Maximum = 999;
         public static Click Click { get; } = new Click();
-        public ICommand StepperTap { get; }
-        public ICommand ChangeBpm { get; }
-        public ICommand MinusStepper { get; }
-        public ICommand PlusStepper { get; }
-        public ClickViewModel()
-        {
-            BackgroundTasks.ClickEventReceived += HandleClickReceived;
-            ChangeBpm = new Command(_changeBpm);
-            StepperTap = new Command(_stepperTap);
-            MinusStepper = new Command(_minusStepper);
-            PlusStepper = new Command(_plusStepper);
-        }
-        private void _stepperTap ()
+        public ICommand StepperTapCommand { get; } = new Command(StepperTap);
+        public ICommand ChangeBpmCommand { get; } = new Command(ChangeBpm);
+        public ICommand MinusStepperCommand { get; } = new Command(MinusStepper);
+        public ICommand PlusStepperCommand { get; } = new Command(PlusStepper);
+        private static void StepperTap ()
         {
             switch (Click.StepCount)
             {
@@ -43,7 +36,7 @@ namespace PiEar.ViewModels
                     break;
             }
         }
-        private async void _changeBpm()
+        private async static void ChangeBpm()
         {
             string newBpm = await Application.Current.MainPage.DisplayPromptAsync("What is the BPM?", "");
             try
@@ -59,7 +52,7 @@ namespace PiEar.ViewModels
                 Debug.WriteLine(e);
             }
         }
-        private void _minusStepper()
+        private static void MinusStepper()
         {
             Click.Bpm -= Click.StepCount;
             if (Click.Bpm < Minimum)
@@ -67,7 +60,7 @@ namespace PiEar.ViewModels
                 Click.Bpm = Minimum;
             }
         }
-        private void _plusStepper()
+        private static void  PlusStepper()
         {
             Click.Bpm += Click.StepCount;
             if (Click.Bpm > Maximum)
@@ -75,9 +68,13 @@ namespace PiEar.ViewModels
                 Click.Bpm = Maximum;
             }
         }
-        private void HandleClickReceived(object sender, EventArgs args) {
+        public static void HandleClickReceived(object sender, EventArgs args) {
+            if (!App.GlobalMuteStatusValid)
+            {
+                return;
+            }
             Task.Run(() => {
-                if (GlobalMuteViewModel.GlobalMuteStatus.Mute || !Click.Toggled)
+                if (App.GlobalMuteStatus|| !Click.Toggled)
                 {
                     return;
                 }

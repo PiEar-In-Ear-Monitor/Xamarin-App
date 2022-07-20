@@ -12,9 +12,7 @@ namespace PiEar.Models
 {
     public sealed class Click : INotifyPropertyChanged
     {
-        private bool _toggled;
         private int _stepCount = 10;
-        private int _bpm = -1;
         public ISimpleAudioPlayer Player { get; } = CrossSimpleAudioPlayer.CreateSimpleAudioPlayer();
         public double Volume
         {
@@ -26,6 +24,7 @@ namespace PiEar.Models
                 OnPropertyChanged();
             }
         }
+        private int _bpm = -1;
         public int Bpm
         {
             get => _bpm;
@@ -46,6 +45,7 @@ namespace PiEar.Models
                 }
             }
         }
+        private bool _toggled;
         public bool Toggled
         {
             get => _toggled;

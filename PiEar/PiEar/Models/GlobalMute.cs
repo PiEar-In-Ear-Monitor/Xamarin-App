@@ -1,21 +1,23 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using PiEar.Annotations;
+using Plugin.Settings;
 
 namespace PiEar.Models
 {
     public class GlobalMute : INotifyPropertyChanged
     {
-        private bool _mute;
+        public string GlobalMuteImage => Mute ? "mute" : "unmute";
         public bool Mute
         {
-            get => _mute;
+            get => CrossSettings.Current.GetValueOrDefault("globalMute", false, Settings.File);
             set
             {
-                _mute = value;
+                CrossSettings.Current.AddOrUpdateValue("globalMute", value, Settings.File);
                 OnPropertyChanged();
+                OnPropertyChanged("GlobalMuteImage");
             } 
-        } // TODO: Make this a saved setting
+        }
         public event PropertyChangedEventHandler PropertyChanged;
         [NotifyPropertyChangedInvocator]
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)

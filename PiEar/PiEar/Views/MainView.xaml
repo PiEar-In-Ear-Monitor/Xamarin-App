@@ -3,32 +3,32 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:PiEar.ViewModels;assembly=PiEar"
              xmlns:helpers="clr-namespace:PiEar.Helpers;assembly=PiEar"
+             xmlns:base="clr-namespace:PiEar;assembly=PiEar"
              x:Class="PiEar.Views.MainView">
     <ContentPage.BindingContext>
-        <viewmodels:MainViewViewModel/>
+        <viewmodels:MainViewViewModel x:Name="ViewModel"/>
     </ContentPage.BindingContext>
     <ContentPage.Resources>
         <helpers:BoolConverter x:Key="CustomBoolConverter" />
         <helpers:ImageConverter x:Key="CustomImageConverter" />
+        <helpers:GlobalMuteConverter x:Key="CustomGlobalMuteConverter" />
         <helpers:VolumeConverter x:Key="CustomVolumeConverter" />
     </ContentPage.Resources>
     <ContentPage.ToolbarItems>
         <ToolbarItem
-            x:DataType="viewmodels:MainViewViewModel"
-            IconImageSource="{Binding GlobalMute.GlobalMuteStatus.Mute, Converter={StaticResource CustomImageConverter}}"
+            IconImageSource="{Binding Source={StaticResource GlobalMuteKey}, Path=GlobalMuteImage, Mode=TwoWay}"
             Command="{Binding GlobalMute.OnClickedCommand}"/>
         <ToolbarItem
             IconImageSource="icon" 
-            Clicked="_openAbout"
-        />
+            Clicked="OpenAbout"/>
         <ToolbarItem
             IconImageSource="settings"
-            Clicked="_openSettings"
-        />
+            Clicked="OpenSettings"/>
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
-        <StackLayout>
-            <StackLayout
+        <StackLayout
+            x:DataType="viewmodels:MainViewViewModel">
+            <!--<StackLayout
                 Orientation="Horizontal"
                 x:DataType="viewmodels:MainViewViewModel">
                 <Switch
@@ -36,7 +36,7 @@
                     VerticalOptions="Center"
                     Scale="1.35"
                     Margin="20,0,0,0"
-                    IsToggled="{Binding ClickViewModel.Click.Toggled, Mode=TwoWay}"/>
+                    IsToggled="{Binding Click.Click.Toggled, Mode=TwoWay}"/>
                 <Image
                     HorizontalOptions="Center"
                     VerticalOptions="Center"
@@ -45,7 +45,7 @@
                     Source="pan"
                     BackgroundColor="Transparent"
                     Margin="0, 0"
-                    Rotation="{Binding  ClickViewModel.Click.Rotation}">
+                    Rotation="{Binding  Click.Click.Rotation}">
                     <Image.GestureRecognizers>
                         <PanGestureRecognizer PanUpdated="PanGestureRecognizer_OnPanUpdated"/>
                     </Image.GestureRecognizers>
@@ -63,7 +63,7 @@
                             FontSize="43"
                             Text="-">
                             <Label.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding ClickViewModel.MinusStepper}"/>
+                                <TapGestureRecognizer Command="{Binding Click.MinusStepperCommand}"/>
                             </Label.GestureRecognizers>
                         </Label>
                         <Label
@@ -71,11 +71,11 @@
                             VerticalOptions="Center"
                             WidthRequest="40"
                             FontSize="35"
-                            Text="{Binding ClickViewModel.Click.StepCount, StringFormat='{0,2}'}">
+                            Text="{Binding Click.Click.StepCount, StringFormat='{0,2}'}">
                             <Label.GestureRecognizers>
                                 <TapGestureRecognizer
                                     NumberOfTapsRequired="1"
-                                    Command="{Binding ClickViewModel.StepperTap}"/>
+                                    Command="{Binding Click.StepperTapCommand}"/>
                             </Label.GestureRecognizers>
                         </Label>
                         <Label
@@ -84,7 +84,7 @@
                             FontSize="40"
                             Text="+">
                             <Label.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding ClickViewModel.PlusStepper}"/>
+                                <TapGestureRecognizer Command="{Binding Click.PlusStepperCommand}"/>
                             </Label.GestureRecognizers>
                         </Label>
                     </StackLayout>
@@ -94,14 +94,14 @@
                     VerticalOptions="CenterAndExpand"
                     FontSize="20"
                     Padding="10, 0"
-                    Text="{Binding ClickViewModel.Click.Bpm, StringFormat='BPM: {0:##0}'}">
+                    Text="{Binding Click.Click.Bpm, StringFormat='BPM: {0:##0}'}">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer
                             NumberOfTapsRequired="2"
-                            Command="{Binding ClickViewModel.ChangeBpm}"/>
+                            Command="{Binding Click.ChangeBpmCommand}"/>
                     </Label.GestureRecognizers>
                 </Label>
-            </StackLayout>
+            </StackLayout>-->
             <ListView
                 x:Name="ListOfChannels"
                 SelectionMode="None"

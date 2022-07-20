@@ -3,25 +3,26 @@ namespace PiEar.Droid.Interfaces
 {
     public class Log : PiEar.Interfaces.ILog
     {
+        private string Tag = "PiEar";
         public void DebugWrite(string message)
         {
-            Android.Util.Log.Debug("org.OConnor.PiEar", message);
+            Android.Util.Log.Debug(Tag, message);
         }
         public void ErrorWrite(string message)
         {
-            Android.Util.Log.Error("org.OConnor.PiEar", message);
+            Android.Util.Log.Error(Tag, message);
         }
         public void WarnWrite(string message)
         {
-            Android.Util.Log.Warn("org.OConnor.PiEar", message);
+            Android.Util.Log.Warn(Tag, message);
         }
         public void InfoWrite(string message)
         {
-            Android.Util.Log.Info("org.OConnor.PiEar", message);
+            Android.Util.Log.Info(Tag, message);
         }
         public void VerboseWrite(string message)
         {
-            Android.Util.Log.Verbose("org.OConnor.PiEar", message);
+            Android.Util.Log.Verbose(Tag, message);
         }
     }
 }

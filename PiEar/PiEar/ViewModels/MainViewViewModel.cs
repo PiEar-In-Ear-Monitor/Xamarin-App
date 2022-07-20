@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using Newtonsoft.Json;
 using PiEar.Helpers;
 using PiEar.Models;
+using Xamarin.Forms;
 
 namespace PiEar.ViewModels
 {
@@ -13,15 +15,21 @@ namespace PiEar.ViewModels
     {
         public MainViewViewModel()
         {
-            Task.Run(_setup);
-            Task.Run(SseLoop);
+            Task.Run(Setup);
+            //Task.Run(SseLoop);
         }
         public IList<StreamViewModel> Streams { get; } = new List<StreamViewModel>();
-        public ClickViewModel ClickViewModel { get; } = new ClickViewModel();
+        public ClickViewModel Click { get; } = new ClickViewModel();
         public GlobalMuteViewModel GlobalMute { get; } = new GlobalMuteViewModel();
-        private void HandleStreamReceived(object sender, BackgroundTasks.StreamEvent e) {
-            Task.Run(() => {
-                if (Streams.Count - 1 <= e.Channel || GlobalMuteViewModel.GlobalMuteStatus.Mute || Streams[e.Channel].Stream.Mute)
+        private void HandleStreamReceived(object sender, BackgroundTasks.StreamEvent e)
+        {
+            if (!App.GlobalMuteStatusValid)
+            {
+                return;
+            }
+            Task.Run(() =>
+            {
+                if (e.Channel >= Streams.Count || App.GlobalMuteStatus || Streams[e.Channel].Stream.Mute)
                 {
                     return;
                 }
@@ -37,15 +45,17 @@ namespace PiEar.ViewModels
             App.Logger.InfoWrite($"Loading click: {Settings.ClickFilename}");
             // _clickViewModel.Click.Player.Load(typeof(App).GetTypeInfo().Assembly.GetManifestResourceStream(Settings.ClickFilename)?.ToString());
         }
-        private async void _setup()
+        private async void Setup()
         {
             LoadClickFile(null, null);
             BackgroundTasks.StreamEventReceived += HandleStreamReceived;
             SettingsViewModel.ClickFileChanged += LoadClickFile;
-            while(Networking.ServerIp == null)
+            App.Logger.InfoWrite("Wating for server to be found");
+            while (Networking.ServerIp == null)
             {
                 await Task.Delay(500);
             }
+            App.Logger.InfoWrite($"Found server at {Networking.ServerIp}");
             string resp = await Networking.GetRequest("/channel-name");
             JsonData json;
             if (resp != null)
@@ -61,7 +71,7 @@ namespace PiEar.ViewModels
                             {
                                 Streams.Add(new StreamViewModel());
                             }
-                        }   
+                        }
                     }
                     else
                     {
