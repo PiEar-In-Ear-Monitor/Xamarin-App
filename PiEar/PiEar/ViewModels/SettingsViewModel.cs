@@ -19,8 +19,8 @@ namespace PiEar.ViewModels
 
         private static int SelectedItemIndex
         {
-            get => CrossSettings.Current.GetValueOrDefault($"clickAudioIndex", 0, Settings.File);
-            set => CrossSettings.Current.AddOrUpdateValue($"clickAudioIndex", value, Settings.File);
+            get => CrossSettings.Current.GetValueOrDefault($"clickAudioIndex", 0, Settings.ChannelFile);
+            set => CrossSettings.Current.AddOrUpdateValue($"clickAudioIndex", value, Settings.ChannelFile);
         }
         public string SelectedSound
         {
@@ -46,9 +46,7 @@ namespace PiEar.ViewModels
         }
         private  static void Reset()
         {
-            string clickBackup = Settings.ClickFilename;
-            CrossSettings.Current.Clear(Settings.File);
-            Settings.ClickFilename = clickBackup;
+            CrossSettings.Current.Clear(Settings.ChannelFile);
         }
         public static event EventHandler ClickFileChanged;
         public event PropertyChangedEventHandler PropertyChanged;

@@ -8,15 +8,12 @@ namespace PiEar.Helpers
     {
         private static readonly Multicast IpMulticast =
             new Multicast(IPAddress.Parse(Networking.MulticastIp), Networking.MulticastPort);
-
         public static event EventHandler<EventArgs> ClickEventReceived;
         public static event EventHandler<StreamEvent> StreamEventReceived;
-
         static BackgroundTasks()
         {
             IpMulticast.UdpMessageReceived += HandleNewData;
         }
-
         public class StreamEvent : EventArgs
         {
             public int Channel { get; }
@@ -28,7 +25,6 @@ namespace PiEar.Helpers
                 Data = data;
             }
         }
-
         private static void HandleNewData(object sender, Multicast.UdpMessageReceivedEventArgs args)
         {
             if (args.Buffer.Length == 4)

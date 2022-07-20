@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using PiEar.ViewModels;
 using Xamarin.Forms;
 
@@ -6,17 +7,14 @@ namespace PiEar.Views
 {
     public partial class MainView
     {
-        public MainView()
-        {
-            InitializeComponent();
-        }
+        public MainView() => InitializeComponent();
         protected override void OnAppearing()
         {
-            //var tmp = ListOfChannels.ItemsSource;
-            //ListOfChannels.ItemsSource = null;
-            //ListOfChannels.ItemsSource = tmp;
-            // ListOfChannels.ItemsSource = ListOfChannels.ItemsSource;
-            ClickViewModel.Click.Rotation = ClickViewModel.Click.Rotation;
+            while (!ViewModel.SetupComplete)
+            {
+                Task.Yield();
+            }
+            ListOfChannels.ItemsSource = ViewModel.Streams;
         }
         private async void OpenSettings(object sender, EventArgs e)
         {
@@ -28,7 +26,7 @@ namespace PiEar.Views
         }
         private void PanGestureRecognizer_OnPanUpdated(object sender, PanUpdatedEventArgs e)
         {
-            ClickViewModel.PanVolume(e);
+            ViewModel.Click.PanVolume(e);
         }
     }
 }

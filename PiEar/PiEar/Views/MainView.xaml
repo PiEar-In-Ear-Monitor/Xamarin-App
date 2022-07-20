@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:PiEar.ViewModels;assembly=PiEar"
              xmlns:helpers="clr-namespace:PiEar.Helpers;assembly=PiEar"
-             xmlns:base="clr-namespace:PiEar;assembly=PiEar"
              x:Class="PiEar.Views.MainView">
     <ContentPage.BindingContext>
         <viewmodels:MainViewViewModel x:Name="ViewModel"/>
@@ -26,20 +25,13 @@
             Clicked="OpenSettings"/>
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
-        <StackLayout
-            x:DataType="viewmodels:MainViewViewModel">
-            <!--<StackLayout
-                Orientation="Horizontal"
-                x:DataType="viewmodels:MainViewViewModel">
+        <StackLayout x:DataType="viewmodels:MainViewViewModel">
+            <StackLayout Orientation="Horizontal">
                 <Switch
-                    HorizontalOptions="Start"
-                    VerticalOptions="Center"
                     Scale="1.35"
                     Margin="20,0,0,0"
                     IsToggled="{Binding Click.Click.Toggled, Mode=TwoWay}"/>
                 <Image
-                    HorizontalOptions="Center"
-                    VerticalOptions="Center"
                     WidthRequest="40"
                     HeightRequest="40"
                     Source="pan"
@@ -56,8 +48,6 @@
                        Margin="30, 5, 10, 0">
                     <StackLayout Orientation="Horizontal">
                         <Label
-                            HorizontalOptions="Start"
-                            VerticalOptions="Center"
                             FontAttributes="Bold"
                             WidthRequest="20"
                             FontSize="43"
@@ -67,7 +57,6 @@
                             </Label.GestureRecognizers>
                         </Label>
                         <Label
-                            HorizontalOptions="Center"
                             VerticalOptions="Center"
                             WidthRequest="40"
                             FontSize="35"
@@ -79,8 +68,6 @@
                             </Label.GestureRecognizers>
                         </Label>
                         <Label
-                            HorizontalOptions="Center"
-                            VerticalOptions="Center"
                             FontSize="40"
                             Text="+">
                             <Label.GestureRecognizers>
@@ -90,18 +77,17 @@
                     </StackLayout>
                 </Frame>
                 <Label
-                    HorizontalOptions="EndAndExpand"
-                    VerticalOptions="CenterAndExpand"
+                    VerticalOptions="Center"
                     FontSize="20"
                     Padding="10, 0"
                     Text="{Binding Click.Click.Bpm, StringFormat='BPM: {0:##0}'}">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer
-                            NumberOfTapsRequired="2"
-                            Command="{Binding Click.ChangeBpmCommand}"/>
+                        NumberOfTapsRequired="2"
+                        Command="{Binding Click.ChangeBpmCommand}"/>
                     </Label.GestureRecognizers>
                 </Label>
-            </StackLayout>-->
+            </StackLayout>
             <ListView
                 x:Name="ListOfChannels"
                 SelectionMode="None"

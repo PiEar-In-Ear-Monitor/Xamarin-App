@@ -37,7 +37,6 @@ namespace PiEar
             var service = DependencyService.Get<IMulticastLock>();
             service.Acquire();
             Networking.FindServerIp();
-            BackgroundTasks.ClickEventReceived += ClickViewModel.HandleClickReceived;
         }
         protected override void OnStart()
         {

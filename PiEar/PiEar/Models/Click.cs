@@ -13,13 +13,13 @@ namespace PiEar.Models
     public sealed class Click : INotifyPropertyChanged
     {
         private int _stepCount = 10;
-        public ISimpleAudioPlayer Player { get; } = CrossSimpleAudioPlayer.CreateSimpleAudioPlayer();
-        public double Volume
+        public ISimpleAudioPlayer Player { get; } = CrossSimpleAudioPlayer.Current;
+        private double Volume
         {
-            get => CrossSettings.Current.GetValueOrDefault($"clickVolume", 0.0, Settings.File);
+            get => CrossSettings.Current.GetValueOrDefault($"clickVolume", 0.0, Settings.ClickFile);
             set
             {
-                CrossSettings.Current.AddOrUpdateValue($"clickVolume", value, Settings.File);
+                CrossSettings.Current.AddOrUpdateValue($"clickVolume", value, Settings.ClickFile);
                 Player.Volume = value;
                 OnPropertyChanged();
             }
@@ -54,7 +54,7 @@ namespace PiEar.Models
                 var resp = Task.Run(async () => await Networking.PutRequest($"/bpm?bpmEnabled={(value)}"));
                 resp.Wait();
                 var json = JsonConvert.DeserializeObject<JsonData>(resp.Result);
-                if (json == null || json.Error != null)
+                if (json == null || json.Error != "")
                 {
                     Debug.WriteLine(json?.Error);
                 }

@@ -2,25 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using Newtonsoft.Json;
 using PiEar.Helpers;
 using PiEar.Models;
-using Xamarin.Forms;
 
 namespace PiEar.ViewModels
 {
     public class MainViewViewModel
     {
-        public MainViewViewModel()
-        {
-            Task.Run(Setup);
-            //Task.Run(SseLoop);
-        }
+        public MainViewViewModel() => Task.Run(Setup).Wait();
         public IList<StreamViewModel> Streams { get; } = new List<StreamViewModel>();
         public ClickViewModel Click { get; } = new ClickViewModel();
         public GlobalMuteViewModel GlobalMute { get; } = new GlobalMuteViewModel();
+        public bool SetupComplete { get; private set; } = false;
+        private Task _sseLoopTask;
         private void HandleStreamReceived(object sender, BackgroundTasks.StreamEvent e)
         {
             if (!App.GlobalMuteStatusValid)
@@ -37,20 +34,20 @@ namespace PiEar.ViewModels
                 // Streams[e.Channel].Stream.Buffer.Seek(0, SeekOrigin.Begin);
                 // Streams[e.Channel].Stream.Player.Load(_streams[e.Channel].Stream.Buffer);
                 // Streams[e.Channel].Stream.Player.Play();
-                Streams[e.Channel].Stream.Player.Play(e.Data);
+                // Streams[e.Channel].Stream.Player.Play(e.Data);
             });
         }
         private void LoadClickFile(object sender, EventArgs e)
         {
             App.Logger.InfoWrite($"Loading click: {Settings.ClickFilename}");
-            // _clickViewModel.Click.Player.Load(typeof(App).GetTypeInfo().Assembly.GetManifestResourceStream(Settings.ClickFilename)?.ToString());
+            Click.Click.Player.Load(typeof(App).GetTypeInfo().Assembly.GetManifestResourceStream(Settings.ClickFilename));
         }
         private async void Setup()
         {
-            LoadClickFile(null, null);
+            LoadClickFile(this, null);
             BackgroundTasks.StreamEventReceived += HandleStreamReceived;
             SettingsViewModel.ClickFileChanged += LoadClickFile;
-            App.Logger.InfoWrite("Wating for server to be found");
+            App.Logger.InfoWrite("Waiting for server to be found");
             while (Networking.ServerIp == null)
             {
                 await Task.Delay(500);
@@ -63,8 +60,9 @@ namespace PiEar.ViewModels
                 json = JsonConvert.DeserializeObject<JsonData>(resp);
                 if (json != null)
                 {
-                    if (json.Error != null)
+                    if (json.Error != "")
                     {
+                        App.Logger.InfoWrite($"Setting up {json.ChannelCount} channels");
                         if (json.ChannelCount != -1)
                         {
                             for (int i = 0; i < json.ChannelCount; i++)
@@ -85,12 +83,12 @@ namespace PiEar.ViewModels
                 json = JsonConvert.DeserializeObject<JsonData>(resp);
                 if (json != null)
                 {
-                    if (json.Error == null)
+                    if (json.Error != "")
                     {
                         if (json.Bpm != -1)
                         {
-                            ClickViewModel.Click.ChangeBpm(json.Bpm);
-                            ClickViewModel.Click.ChangeToggle(json.BpmEnabled);
+                            Click.Click.ChangeBpm(json.Bpm);
+                            Click.Click.ChangeToggle(json.BpmEnabled);
                         }
                     }
                     else
@@ -99,13 +97,11 @@ namespace PiEar.ViewModels
                     }
                 }
             }
+            _sseLoopTask = Task.Run(SseLoop);
+            SetupComplete = true;
         }
         private void SseLoop()
         {
-            while (Networking.ServerIp == null)
-            {
-                Task.Delay(1000);
-            }
             while (true)
             {
                 try
@@ -127,18 +123,20 @@ namespace PiEar.ViewModels
                                     var json = JsonConvert.DeserializeObject<JsonData>(line);
                                     if (json == null)
                                     {
+                                        App.Logger.VerboseWrite("Testing");
                                         continue;
                                     }
                                     if (line.Contains("channel_name")) {
+                                        App.Logger.InfoWrite($"Changing channel {json.Id}'s name to {json.ChannelName}");
                                         Streams[json.Id].Stream.ChangeLabel(json.ChannelName);
-                                    }
-                                    if (line.Contains("bpm_enabled"))
+                                    } else if (line.Contains("bpm_enabled"))
                                     {
-                                        ClickViewModel.Click.ChangeToggle(json.BpmEnabled);
-                                    }
-                                    if (line.Contains("bpm") && !line.Contains("bpm_enabled"))
+                                        App.Logger.InfoWrite($"BpmEnabled = {json.BpmEnabled}");
+                                        Click.Click.ChangeToggle(json.BpmEnabled);
+                                    } else if (line.Contains("bpm"))
                                     {
-                                        ClickViewModel.Click.ChangeBpm(json.Bpm);
+                                        App.Logger.InfoWrite($"Changing BPM to {json.Bpm}");
+                                        Click.Click.ChangeBpm(json.Bpm);
                                     }
                                 }
                             }

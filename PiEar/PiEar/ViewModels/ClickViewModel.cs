@@ -1,13 +1,9 @@
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using PiEar.Annotations;
 using PiEar.Helpers;
 using PiEar.Models;
-using PiEar.Views;
 using Xamarin.Forms;
 
 namespace PiEar.ViewModels
@@ -16,12 +12,36 @@ namespace PiEar.ViewModels
     {
         private const int Minimum = 0;
         private const int Maximum = 999;
-        public static Click Click { get; } = new Click();
-        public ICommand StepperTapCommand { get; } = new Command(StepperTap);
-        public ICommand ChangeBpmCommand { get; } = new Command(ChangeBpm);
-        public ICommand MinusStepperCommand { get; } = new Command(MinusStepper);
-        public ICommand PlusStepperCommand { get; } = new Command(PlusStepper);
-        private static void StepperTap ()
+        public ClickViewModel()
+        {
+            BackgroundTasks.ClickEventReceived += HandleClickReceived;
+            StepperTapCommand = new Command(StepperTap);
+            ChangeBpmCommand = new Command(ChangeBpm);
+            MinusStepperCommand = new Command(MinusStepper);
+            PlusStepperCommand = new Command(PlusStepper);
+        }
+        public Click Click { get; } = new Click();
+        public ICommand StepperTapCommand { get; }
+        public ICommand ChangeBpmCommand { get; }
+        public ICommand MinusStepperCommand { get; }
+        public ICommand PlusStepperCommand { get; }
+        
+        public void PanVolume(PanUpdatedEventArgs e)
+        {
+            if (e.StatusType == GestureStatus.Running)
+            {
+                Click.Rotation += e.TotalX / 2.0;
+            }
+            if (Click.Rotation > 130)
+            {
+                Click.Rotation = 130;
+            }
+            else if (Click.Rotation < -130)
+            {
+                Click.Rotation = -130;
+            }
+        }
+        private void StepperTap ()
         {
             switch (Click.StepCount)
             {
@@ -36,9 +56,9 @@ namespace PiEar.ViewModels
                     break;
             }
         }
-        private async static void ChangeBpm()
+        private async void ChangeBpm()
         {
-            string newBpm = await Application.Current.MainPage.DisplayPromptAsync("What is the BPM?", "");
+            string newBpm = await Application.Current.MainPage.DisplayPromptAsync("Change BPM", "Please enter the new BPM", keyboard:Keyboard.Numeric);
             try
             {
                 int intBpm = int.Parse(newBpm);
@@ -52,7 +72,7 @@ namespace PiEar.ViewModels
                 Debug.WriteLine(e);
             }
         }
-        private static void MinusStepper()
+        private void MinusStepper()
         {
             Click.Bpm -= Click.StepCount;
             if (Click.Bpm < Minimum)
@@ -60,7 +80,7 @@ namespace PiEar.ViewModels
                 Click.Bpm = Minimum;
             }
         }
-        private static void  PlusStepper()
+        private void  PlusStepper()
         {
             Click.Bpm += Click.StepCount;
             if (Click.Bpm > Maximum)
@@ -68,7 +88,7 @@ namespace PiEar.ViewModels
                 Click.Bpm = Maximum;
             }
         }
-        public static void HandleClickReceived(object sender, EventArgs args) {
+        private void HandleClickReceived(object sender, EventArgs args) {
             if (!App.GlobalMuteStatusValid)
             {
                 return;
@@ -80,21 +100,6 @@ namespace PiEar.ViewModels
                 }
                 Click.Player.Play();
             });
-        }
-        public static void PanVolume(PanUpdatedEventArgs e)
-        {
-            if (e.StatusType == GestureStatus.Running)
-            {
-                Click.Rotation += e.TotalX / 2.0;
-            }
-            if (Click.Rotation > 130)
-            {
-                Click.Rotation = 130;
-            }
-            else if (Click.Rotation < -130)
-            {
-                Click.Rotation = -130;
-            }
         }
     }
 }

@@ -1,6 +1,5 @@
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,36 +8,17 @@ using PiEar.Annotations;
 using PiEar.Helpers;
 using PiEar.Interfaces;
 using Plugin.Settings;
-using Plugin.SimpleAudioPlayer;
 using Xamarin.Forms;
 
 namespace PiEar.Models
 {
     public sealed class Stream : INotifyPropertyChanged
     {
-        private static int _count = -1;
+        private static int _count;
         private string Id { get; } = _count++.ToString();
         private string _label;
-        public static bool GlobalMute { get; set; } = false;
-
-        public static string GlobalMuteString
-        {
-            get => GlobalMute.ToString();
-            set
-            {
-                if (value.ToLower() == "true")
-                {
-                    GlobalMute = true;
-                }
-                else if (value.ToLower() == "false")
-                {
-                    GlobalMute = false;
-                }
-            }
-        }
-
-        public System.IO.Stream Buffer { get; } = new System.IO.MemoryStream( );
-        public IPiearAudio Player { get; }
+        // public System.IO.Stream Buffer { get; } = new System.IO.MemoryStream( );
+        // public IPiearAudio Player { get; }
         // public ISimpleAudioPlayer Player { get; } = CrossSimpleAudioPlayer.CreateSimpleAudioPlayer();
         public string Label
         {
@@ -53,29 +33,29 @@ namespace PiEar.Models
         }
         public bool Mute
         {
-            get => CrossSettings.Current.GetValueOrDefault($"channelMute{Id}", false, Settings.File);
+            get => CrossSettings.Current.GetValueOrDefault($"channelMute{Id}", false, Settings.ChannelFile);
             set
             {
-                CrossSettings.Current.AddOrUpdateValue($"channelMute{Id}", value, Settings.File);
+                CrossSettings.Current.AddOrUpdateValue($"channelMute{Id}", value, Settings.ChannelFile);
                 OnPropertyChanged();
             }
         }
         public double Pan
         {
-            get => CrossSettings.Current.GetValueOrDefault($"channelPan{Id}", 0.0, Settings.File);
+            get => CrossSettings.Current.GetValueOrDefault($"channelPan{Id}", 0.0, Settings.ChannelFile);
             set
             {
-                CrossSettings.Current.AddOrUpdateValue($"channelPan{Id}", value, Settings.File);
+                CrossSettings.Current.AddOrUpdateValue($"channelPan{Id}", value, Settings.ChannelFile);
                 OnPropertyChanged();
             }
         }
         public double Volume
         {
-            get => CrossSettings.Current.GetValueOrDefault($"channelVolume{Id}", 0.0, Settings.File);
+            get => CrossSettings.Current.GetValueOrDefault($"channelVolume{Id}", 0.0, Settings.ChannelFile);
             set
             {
-                CrossSettings.Current.AddOrUpdateValue($"channelVolume{Id}", value, Settings.File);
-                Player.SetVolume((float) value);
+                CrossSettings.Current.AddOrUpdateValue($"channelVolume{Id}", value, Settings.ChannelFile);
+                // Player?.SetVolume((float) value);
                 OnPropertyChanged();
             }
         }
@@ -98,7 +78,7 @@ namespace PiEar.Models
             {
                 _label = "";
             }
-            Player = DependencyService.Get<IPiearAudio>();
+            // Player = DependencyService.Get<IPiearAudio>();
             // Player.Load(Buffer);
         }
         public void ChangeLabel(string value)

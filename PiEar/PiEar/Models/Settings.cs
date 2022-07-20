@@ -6,11 +6,12 @@ namespace PiEar.Models
 {
     public static class Settings
     {
-        public const string File = "Settings.set";
+        public const string ChannelFile = "channelSettings.set";
+        public const string ClickFile = "channelSettings.set";
         public static string ClickFilename
         {
-            get => CrossSettings.Current.GetValueOrDefault("clickSound", "Beep", File);
-            set => CrossSettings.Current.AddOrUpdateValue("clickSound", $"PiEar.Click.{value}.ogg", File);
+            get => CrossSettings.Current.GetValueOrDefault("clickSound", "PiEar.Click.Beep.ogg", ClickFile);
+            set => CrossSettings.Current.AddOrUpdateValue("clickSound", $"PiEar.Click.{value}.ogg", ClickFile);
         }
         public static readonly IList ClickOptions = new List<string>()
             { "Beep", "Click", "Clink", "Clonk", "Cluck", "Metal", "Plastic", "Sticks", "Tap", "Wood" };

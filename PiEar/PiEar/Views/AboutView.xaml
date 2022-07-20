@@ -5,9 +5,7 @@
              Title="About Pi-Ear">
     <ContentPage.Content>
         <ScrollView>
-            <Label VerticalOptions="StartAndExpand"
-                   HorizontalOptions="CenterAndExpand"
-                   FontSize="Body">
+            <Label FontSize="Body">
 Pi-Ear is my pet project. Please feel free to let me know if you have any feedback through the GitHub Repository at https://github.com/PiEar-In-Ear-Monitor/Xamarin-App
 
 _____

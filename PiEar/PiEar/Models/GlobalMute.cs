@@ -10,12 +10,12 @@ namespace PiEar.Models
         public string GlobalMuteImage => Mute ? "mute" : "unmute";
         public bool Mute
         {
-            get => CrossSettings.Current.GetValueOrDefault("globalMute", false, Settings.File);
+            get => CrossSettings.Current.GetValueOrDefault("globalMute", false, Settings.ClickFile);
             set
             {
-                CrossSettings.Current.AddOrUpdateValue("globalMute", value, Settings.File);
+                CrossSettings.Current.AddOrUpdateValue("globalMute", value, Settings.ClickFile);
                 OnPropertyChanged();
-                OnPropertyChanged("GlobalMuteImage");
+                OnPropertyChanged(nameof(GlobalMuteImage));
             } 
         }
         public event PropertyChangedEventHandler PropertyChanged;
