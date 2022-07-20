@@ -29,19 +29,6 @@ namespace PiEar.Helpers
             return (string)value == "mute";
         }
     }
-    public class GlobalMuteConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            App.Logger.InfoWrite($"Converter: Mute here is {((GlobalMute)value).Mute}");
-            return ((GlobalMute) value ).Mute ? "mute" : "unmute";
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return (string)value == "mute";
-        }
-    }
     public class VolumeConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

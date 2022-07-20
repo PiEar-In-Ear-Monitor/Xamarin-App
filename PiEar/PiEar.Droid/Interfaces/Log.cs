@@ -3,7 +3,7 @@ namespace PiEar.Droid.Interfaces
 {
     public class Log : PiEar.Interfaces.ILog
     {
-        private string Tag = "PiEar";
+        private const string Tag = "PiEar";
         public void DebugWrite(string message)
         {
             Android.Util.Log.Debug(Tag, message);

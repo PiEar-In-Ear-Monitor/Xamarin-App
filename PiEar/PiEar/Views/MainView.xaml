@@ -11,10 +11,10 @@
     <ContentPage.Resources>
         <helpers:BoolConverter x:Key="CustomBoolConverter" />
         <helpers:ImageConverter x:Key="CustomImageConverter" />
-        <helpers:GlobalMuteConverter x:Key="CustomGlobalMuteConverter" />
         <helpers:VolumeConverter x:Key="CustomVolumeConverter" />
     </ContentPage.Resources>
     <ContentPage.ToolbarItems>
+        <ToolbarItem Text="PiEar - In-Ear Monitoring   "/>
         <ToolbarItem
             IconImageSource="{Binding Source={StaticResource GlobalMuteKey}, Path=GlobalMuteImage, Mode=TwoWay}"
             Command="{Binding GlobalMute.OnClickedCommand}"/>
