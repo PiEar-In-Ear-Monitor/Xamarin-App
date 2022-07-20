@@ -53,6 +53,9 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="Interfaces\Address.cs" />
+        <Compile Include="Interfaces\PiEarAudio.cs" />
+        <Compile Include="Interfaces\CustomAudioSource.cs" />
+        <Compile Include="Interfaces\Log.cs" />
         <Compile Include="Interfaces\MulticastLock.cs" />
         <Compile Include="MainActivity.cs" />
         <Compile Include="Resources\Resource.designer.cs" />

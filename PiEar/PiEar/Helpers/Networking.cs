@@ -11,39 +11,40 @@ namespace PiEar.Helpers
     {
         private static bool _foundIp;
         private static string _serverIp;
-        public static string ServerIp => (_foundIp) ? _serverIp : "IP Not Found";
+        private static UdpClient _udpClient;
+        public static string ServerIp => (_foundIp) ? _serverIp : null;
         public const int Port = 9090;
         public const int MulticastPort = 6666;
         public const string MulticastIp = "224.0.0.69";
         public static async Task<string> GetRequest(string endpoint, bool forDiscovery = false)
         {
-            if (!_foundIp && !forDiscovery) return "";
+            if (!_foundIp && !forDiscovery) return null;
             try
             {
                 WebRequest request = WebRequest.Create ($"http://{_serverIp}:{Port}{endpoint}");
-                request.Timeout = 500;
+                request.Timeout = 5000;
                 return await _getResp(request);
             }
             catch (Exception e)
             {
-                Debug.WriteLine(e);
-                return "";
+                App.Logger.DebugWrite(e.Message);
+                return null;
             }
         }
         public static async Task<string> PutRequest(string endpoint)
         {
-            if (!_foundIp) return "";
+            if (!_foundIp) return null;
             try
             {
                 WebRequest request = WebRequest.Create($"http://{ServerIp}:{Port}{endpoint}");
                 request.Method = "PUT";
-                request.Timeout = 500;
+                request.Timeout = 5000;
                 return await _getResp(request);
             }
             catch (Exception e)
             {
-                Debug.WriteLine(e);
-                return "";
+                App.Logger.DebugWrite(e.Message);
+                return null;
             }
         }
         private static async Task<string> _getResp(WebRequest req)
@@ -61,12 +62,13 @@ namespace PiEar.Helpers
             }
             catch (Exception e)
             {
-                Debug.WriteLine(e);
+                if (e != null)
+                {
+                    Debug.WriteLine($"Failed to get response from server IP {_serverIp}:{Port}");
+                }
                 return "";
             }
         }
-        
-        
         private static void OnUdpDataReceived(IAsyncResult result)
         {
             Debug.WriteLine($">>> in receive");
@@ -82,10 +84,7 @@ namespace PiEar.Helpers
 
             udpClient.BeginReceive(OnUdpDataReceived, udpClient);
         }
-
-        private static UdpClient _udpClient;
-        
-        public static async void FindServerIp()
+        public static void FindServerIp()
         {
             _udpClient = new UdpClient()
             {
@@ -103,6 +102,7 @@ namespace PiEar.Helpers
                 udpClient.EndReceive(result, ref remoteAddr);
                 _serverIp = remoteAddr.Address.ToString();
                 _foundIp = true;
+                Debug.WriteLine($"Found server IP: {_serverIp}");
             }, _udpClient);
             // This was brute force, but it works. Not needed since we can get IP from the multicast packets.
             // byte[] address = DependencyService.Get<IAddress>().ByteIpAddress();

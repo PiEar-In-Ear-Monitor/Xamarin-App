@@ -1,14 +1,15 @@
 using System;
 using System.Diagnostics;
+using System.Linq.Expressions;
 using System.Windows.Input;
 using PiEar.Models;
 using Xamarin.Forms;
 
 namespace PiEar.ViewModels
 {
-    public sealed class StreamController
+    public sealed class StreamViewModel
     {
-        public StreamController()
+        public StreamViewModel()
         {
             LabelTap = new Command(_labelTap);
             ImageTap = new Command(_imageTap);
@@ -16,6 +17,10 @@ namespace PiEar.ViewModels
         public Stream Stream { get; } = new Stream();
         public ICommand LabelTap { get; }
         public ICommand ImageTap { get; }
+        public static EventHandler GlobalMuteCommand { get; } = (sender, args) =>
+        {
+            Stream.GlobalMute = !Stream.GlobalMute;
+        };
         private async void _labelTap () 
         {
             try
@@ -25,7 +30,7 @@ namespace PiEar.ViewModels
                 {
                     return;
                 }
-                Stream.Label = ((newLabel.Length > 26 ) ? newLabel.Substring(0, 26) : newLabel ).Replace(" ", "_");
+                Stream.Label = ((newLabel.Length > 26 ) ? newLabel.Substring(0, 26) : newLabel );
             }
             catch (Exception ex)
             {

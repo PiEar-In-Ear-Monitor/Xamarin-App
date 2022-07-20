@@ -1,15 +1,31 @@
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using PiEar.Annotations;
 using PiEar.Helpers;
+using Plugin.Settings;
+using Plugin.SimpleAudioPlayer;
 
 namespace PiEar.Models
 {
-    public class Click : Stream
+    public sealed class Click : INotifyPropertyChanged
     {
         private bool _toggled;
         private int _stepCount = 10;
         private int _bpm = -1;
+        public ISimpleAudioPlayer Player { get; } = CrossSimpleAudioPlayer.CreateSimpleAudioPlayer();
+        public double Volume
+        {
+            get => CrossSettings.Current.GetValueOrDefault($"clickVolume", 0.0, Settings.File);
+            set
+            {
+                CrossSettings.Current.AddOrUpdateValue($"clickVolume", value, Settings.File);
+                Player.Volume = value;
+                OnPropertyChanged();
+            }
+        }
         public int Bpm
         {
             get => _bpm;
@@ -68,11 +84,20 @@ namespace PiEar.Models
                 OnPropertyChanged();
             }
         }
-        public void SseToggleEnabled(bool enable)
+        public double Rotation
         {
-            Debug.WriteLine($"SSE Enabled: {enable}");
-            _toggled = enable;
-            OnPropertyChanged(nameof(Toggled));
+            get => (Volume * 260) - 130;
+            set
+            {
+                Volume = (float) ((value + 130) / 260);
+                OnPropertyChanged();
+            }
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
+        [NotifyPropertyChangedInvocator]
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

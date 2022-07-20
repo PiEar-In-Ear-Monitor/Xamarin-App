@@ -1,15 +1,13 @@
 using System;
-using System.Diagnostics;
 using System.Globalization;
 using Xamarin.Forms;
 
-namespace PiEar.Models
+namespace PiEar.Helpers
 {
     public class BoolConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            Debug.WriteLine($"Value: {value}, converted value: {!(bool)value}");
             return !(bool) value;
         }
     

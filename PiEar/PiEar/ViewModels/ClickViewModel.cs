@@ -2,33 +2,27 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using PiEar.Annotations;
+using PiEar.Helpers;
 using PiEar.Models;
 using Xamarin.Forms;
 
 namespace PiEar.ViewModels
 {
-    public sealed class ClickController: INotifyPropertyChanged
+    public sealed class ClickViewModel
     {
         private const int Minimum = 0;
         private const int Maximum = 999;
-        public Click Click { get; } = new Click();
+        public static Click Click { get; } = new Click();
         public ICommand StepperTap { get; }
         public ICommand ChangeBpm { get; }
         public ICommand MinusStepper { get; }
         public ICommand PlusStepper { get; }
-        public double Rotation
+        public ClickViewModel()
         {
-            get => (Click.Volume * 260) - 130;
-            set
-            {
-                Click.Volume = (value + 130) / 260;
-                OnPropertyChanged();
-            }
-        }
-        public ClickController()
-        {
+            BackgroundTasks.ClickEventReceived += HandleClickReceived;
             ChangeBpm = new Command(_changeBpm);
             StepperTap = new Command(_stepperTap);
             MinusStepper = new Command(_minusStepper);
@@ -81,11 +75,29 @@ namespace PiEar.ViewModels
                 Click.Bpm = Maximum;
             }
         }
-        public event PropertyChangedEventHandler PropertyChanged;
-        [NotifyPropertyChangedInvocator]
-        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        private void HandleClickReceived(object sender, EventArgs args) {
+            Task.Run(() => {
+                if (GlobalMuteViewModel.GlobalMuteStatus.Mute || !Click.Toggled)
+                {
+                    return;
+                }
+                Click.Player.Play();
+            });
+        }
+        public static void PanVolume(PanUpdatedEventArgs e)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            if (e.StatusType == GestureStatus.Running)
+            {
+                Click.Rotation += e.TotalX / 2.0;
+            }
+            if (Click.Rotation > 130)
+            {
+                Click.Rotation = 130;
+            }
+            else if (Click.Rotation < -130)
+            {
+                Click.Rotation = -130;
+            }
         }
     }
 }

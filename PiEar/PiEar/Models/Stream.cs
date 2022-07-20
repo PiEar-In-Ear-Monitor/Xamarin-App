@@ -7,21 +7,45 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using PiEar.Annotations;
 using PiEar.Helpers;
+using PiEar.Interfaces;
 using Plugin.Settings;
+using Plugin.SimpleAudioPlayer;
+using Xamarin.Forms;
 
 namespace PiEar.Models
 {
-    public class Stream : INotifyPropertyChanged
+    public sealed class Stream : INotifyPropertyChanged
     {
-        private static int _count;
+        private static int _count = -1;
         private string Id { get; } = _count++.ToString();
         private string _label;
-        public string Label
+        public static bool GlobalMute { get; set; } = false;
+
+        public static string GlobalMuteString
         {
-            get => _label.Replace("_", " ");
+            get => GlobalMute.ToString();
             set
             {
-                var resp = Task.Run(async () => await Networking.PutRequest($"/channel-name?id={this.Id}&name={_toBase64(value)}"));
+                if (value.ToLower() == "true")
+                {
+                    GlobalMute = true;
+                }
+                else if (value.ToLower() == "false")
+                {
+                    GlobalMute = false;
+                }
+            }
+        }
+
+        public System.IO.Stream Buffer { get; } = new System.IO.MemoryStream( );
+        public IPiearAudio Player { get; }
+        // public ISimpleAudioPlayer Player { get; } = CrossSimpleAudioPlayer.CreateSimpleAudioPlayer();
+        public string Label
+        {
+            get => _label;
+            set
+            {
+                var resp = Task.Run(async () => await Networking.PutRequest($"/channel-name?id={Id}&name={_toBase64(value)}"));
                 resp.Wait();
                 _label = value;
                 OnPropertyChanged();
@@ -47,10 +71,11 @@ namespace PiEar.Models
         }
         public double Volume
         {
-            get => Convert.ToDouble(CrossSettings.Current.GetValueOrDefault($"channelVolume{Id}", 0.0, Settings.File));
+            get => CrossSettings.Current.GetValueOrDefault($"channelVolume{Id}", 0.0, Settings.File);
             set
             {
                 CrossSettings.Current.AddOrUpdateValue($"channelVolume{Id}", value, Settings.File);
+                Player.SetVolume((float) value);
                 OnPropertyChanged();
             }
         }
@@ -58,18 +83,24 @@ namespace PiEar.Models
         {
             var resp = Task.Run(async () => await Networking.GetRequest($"/channel-name?id={Id}"));
             resp.Wait();
+            if (resp.Result == null)
+            {
+                App.Logger.ErrorWrite($"Failed to get channel name on channel {Id}");
+                return;
+            }
             var channel = JsonConvert.DeserializeObject<JsonData>(resp.Result);
             if (channel != null && channel.Error == null)
             {
                 channel.ChannelName = _fromBase64(channel.ChannelName);
-                Debug.WriteLine(channel.ChannelName);
                 _label = channel.ChannelName;
             }
             else
             {
                 _label = "";
             }
-        }        
+            Player = DependencyService.Get<IPiearAudio>();
+            // Player.Load(Buffer);
+        }
         public void ChangeLabel(string value)
         {
             string converted = null;
@@ -78,15 +109,14 @@ namespace PiEar.Models
                 converted = _fromBase64(value);
             } catch (Exception e)
             {
-                Debug.WriteLine($"Trouble converting {value} to base64: {e.Message}");
+                App.Logger.DebugWrite($"Trouble converting {value} to base64: {e.Message}");
             }
             _label = converted;
             OnPropertyChanged(nameof(Label));
         }
-
         public event PropertyChangedEventHandler PropertyChanged;
         [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

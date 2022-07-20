@@ -6,9 +6,10 @@ using Xamarin.Forms.Platform.Android;
 namespace PiEar.Droid
 {
     [Activity(Label = "Pi-Ear", Icon = "@mipmap/icon", Theme = "@style/MainTheme", MainLauncher = true,
-        ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
+        ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation, ScreenOrientation = ScreenOrientation.Portrait)]
     public class MainActivity : FormsAppCompatActivity
     {
+        public static readonly Interfaces.Log AppLog = new Interfaces.Log();
         protected override void OnCreate(Bundle savedInstanceState)
         {
             TabLayoutResource = Resource.Layout.Tabbar;

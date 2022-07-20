@@ -1,0 +1,164 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:PiEar.ViewModels;assembly=PiEar"
+             xmlns:helpers="clr-namespace:PiEar.Helpers;assembly=PiEar"
+             x:Class="PiEar.Views.MainView">
+    <ContentPage.BindingContext>
+        <viewmodels:MainViewViewModel/>
+    </ContentPage.BindingContext>
+    <ContentPage.Resources>
+        <helpers:BoolConverter x:Key="CustomBoolConverter" />
+        <helpers:ImageConverter x:Key="CustomImageConverter" />
+        <helpers:VolumeConverter x:Key="CustomVolumeConverter" />
+    </ContentPage.Resources>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem
+            x:DataType="viewmodels:MainViewViewModel"
+            IconImageSource="{Binding GlobalMute.GlobalMuteStatus.Mute, Converter={StaticResource CustomImageConverter}}"
+            Command="{Binding GlobalMute.OnClickedCommand}"/>
+        <ToolbarItem
+            IconImageSource="icon" 
+            Clicked="_openAbout"
+        />
+        <ToolbarItem
+            IconImageSource="settings"
+            Clicked="_openSettings"
+        />
+    </ContentPage.ToolbarItems>
+    <ContentPage.Content>
+        <StackLayout>
+            <StackLayout
+                Orientation="Horizontal"
+                x:DataType="viewmodels:MainViewViewModel">
+                <Switch
+                    HorizontalOptions="Start"
+                    VerticalOptions="Center"
+                    Scale="1.35"
+                    Margin="20,0,0,0"
+                    IsToggled="{Binding ClickViewModel.Click.Toggled, Mode=TwoWay}"/>
+                <Image
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    WidthRequest="40"
+                    HeightRequest="40"
+                    Source="pan"
+                    BackgroundColor="Transparent"
+                    Margin="0, 0"
+                    Rotation="{Binding  ClickViewModel.Click.Rotation}">
+                    <Image.GestureRecognizers>
+                        <PanGestureRecognizer PanUpdated="PanGestureRecognizer_OnPanUpdated"/>
+                    </Image.GestureRecognizers>
+                </Image>
+                <Frame CornerRadius="20"
+                       BackgroundColor="LightGray"
+                       Padding="15, 0"
+                       Margin="30, 5, 10, 0">
+                    <StackLayout Orientation="Horizontal">
+                        <Label
+                            HorizontalOptions="Start"
+                            VerticalOptions="Center"
+                            FontAttributes="Bold"
+                            WidthRequest="20"
+                            FontSize="43"
+                            Text="-">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ClickViewModel.MinusStepper}"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                        <Label
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            WidthRequest="40"
+                            FontSize="35"
+                            Text="{Binding ClickViewModel.Click.StepCount, StringFormat='{0,2}'}">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    NumberOfTapsRequired="1"
+                                    Command="{Binding ClickViewModel.StepperTap}"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                        <Label
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            FontSize="40"
+                            Text="+">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ClickViewModel.PlusStepper}"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </StackLayout>
+                </Frame>
+                <Label
+                    HorizontalOptions="EndAndExpand"
+                    VerticalOptions="CenterAndExpand"
+                    FontSize="20"
+                    Padding="10, 0"
+                    Text="{Binding ClickViewModel.Click.Bpm, StringFormat='BPM: {0:##0}'}">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer
+                            NumberOfTapsRequired="2"
+                            Command="{Binding ClickViewModel.ChangeBpm}"/>
+                    </Label.GestureRecognizers>
+                </Label>
+            </StackLayout>
+            <ListView
+                x:Name="ListOfChannels"
+                SelectionMode="None"
+                ItemsSource="{Binding Streams}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <ViewCell.View>
+                                <StackLayout 
+                                    Orientation="Horizontal"
+                                    HorizontalOptions="CenterAndExpand"
+                                    VerticalOptions="CenterAndExpand"
+                                    x:DataType="viewmodels:StreamViewModel">
+                                    <Label
+                                        TextColor="Black" WidthRequest="100"
+                                        HorizontalOptions="Start"
+                                        VerticalTextAlignment="Center"
+                                        Text="{Binding Stream.Label}">
+                                        <Label.GestureRecognizers>
+                                            <TapGestureRecognizer
+                                                NumberOfTapsRequired="2"
+                                                Command="{Binding LabelTap}"/>
+                                        </Label.GestureRecognizers>
+                                    </Label>
+                                    <Slider 
+                                        ThumbColor="Black"
+                                        MinimumTrackColor="Black"
+                                        BackgroundColor="Transparent"
+                                        HorizontalOptions="CenterAndExpand"
+                                        VerticalOptions="Center"
+                                        WidthRequest="170"
+                                        HeightRequest="30"
+                                        Maximum="1"
+                                        Value="{Binding Stream.Volume}"
+                                        IsEnabled="{Binding Stream.Mute, Converter={StaticResource CustomBoolConverter}}"/>
+                                    <Label
+                                        HorizontalOptions="End"
+                                        VerticalOptions="CenterAndExpand"
+                                        Text="{Binding Path=Stream.Volume, Converter={StaticResource CustomVolumeConverter}, StringFormat='{0:##0}%'}"/>                
+                                    <Image
+                                        WidthRequest="30"
+                                        HeightRequest="30"
+                                        HorizontalOptions="End"
+                                        VerticalOptions="Center"
+                                        BackgroundColor="Transparent"
+                                        Source="{Binding Stream.Mute, Converter={StaticResource CustomImageConverter}}">
+                                        <Image.GestureRecognizers>
+                                            <TapGestureRecognizer
+                                                Command="{Binding ImageTap}"/>
+                                        </Image.GestureRecognizers>
+                                    </Image>
+                                </StackLayout>
+                            </ViewCell.View>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>
