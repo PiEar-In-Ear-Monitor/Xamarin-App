@@ -16,7 +16,7 @@ namespace PiEar.ViewModels
         public IList<StreamViewModel> Streams { get; } = new List<StreamViewModel>();
         public ClickViewModel Click { get; } = new ClickViewModel();
         public GlobalMuteViewModel GlobalMute { get; } = new GlobalMuteViewModel();
-        public bool SetupComplete { get; private set; } = false;
+        public bool SetupComplete { get; private set; }
         private Task _sseLoopTask;
         private void HandleStreamReceived(object sender, BackgroundTasks.StreamEvent e)
         {
@@ -30,11 +30,7 @@ namespace PiEar.ViewModels
                 {
                     return;
                 }
-                // Streams[e.Channel].Stream.Buffer.Write(e.Data, 0, e.Data.Length);
-                // Streams[e.Channel].Stream.Buffer.Seek(0, SeekOrigin.Begin);
-                // Streams[e.Channel].Stream.Player.Load(_streams[e.Channel].Stream.Buffer);
-                // Streams[e.Channel].Stream.Player.Play();
-                // Streams[e.Channel].Stream.Player.Play(e.Data);
+                Streams[e.Channel].Stream.Player.Buffer(e.Data);
             });
         }
         private void LoadClickFile(object sender, EventArgs e)

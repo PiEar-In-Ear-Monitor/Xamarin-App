@@ -18,7 +18,7 @@ namespace PiEar.Models
         private string Id { get; } = _count++.ToString();
         private string _label;
         // public System.IO.Stream Buffer { get; } = new System.IO.MemoryStream( );
-        // public IPiearAudio Player { get; }
+        public IPiearAudio Player { get; }
         // public ISimpleAudioPlayer Player { get; } = CrossSimpleAudioPlayer.CreateSimpleAudioPlayer();
         public string Label
         {
@@ -55,7 +55,7 @@ namespace PiEar.Models
             set
             {
                 CrossSettings.Current.AddOrUpdateValue($"channelVolume{Id}", value, Settings.ChannelFile);
-                // Player?.SetVolume((float) value);
+                Player?.SetVolume((float) value);
                 OnPropertyChanged();
             }
         }
@@ -69,7 +69,7 @@ namespace PiEar.Models
                 return;
             }
             var channel = JsonConvert.DeserializeObject<JsonData>(resp.Result);
-            if (channel != null && channel.Error == null)
+            if (channel != null && channel.Error != "")
             {
                 channel.ChannelName = _fromBase64(channel.ChannelName);
                 _label = channel.ChannelName;
@@ -77,9 +77,20 @@ namespace PiEar.Models
             else
             {
                 _label = "";
+                App.Logger.ErrorWrite($"Failed to get channel name on channel {Id}");
             }
-            // Player = DependencyService.Get<IPiearAudio>();
-            // Player.Load(Buffer);
+
+            try
+            {
+                Player = DependencyService.Get<IPiearAudio>();
+                Player.Init();
+                Player.Play();
+            }
+            catch (Exception e)
+            {
+                App.Logger.ErrorWrite($"Failed to get player on channel {Id}");
+                App.Logger.ErrorWrite(e.Message);
+            }
         }
         public void ChangeLabel(string value)
         {

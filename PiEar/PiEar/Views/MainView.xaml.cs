@@ -14,6 +14,7 @@ namespace PiEar.Views
             {
                 Task.Yield();
             }
+            ListOfChannels.ItemsSource = null;
             ListOfChannels.ItemsSource = ViewModel.Streams;
         }
         private async void OpenSettings(object sender, EventArgs e)
