@@ -5,7 +5,7 @@ namespace PiEar.Interfaces
     public interface IPiearAudio
     {
         bool Init();
-        bool Buffer(byte[] data);
+        bool Buffer(short[] data);
         bool Play();
         bool Pause();
         bool Resume();

@@ -9,7 +9,6 @@ namespace PiEar.Droid.Interfaces
     public sealed class PiearAudio : PiEar.Interfaces.IPiearAudio
     {
         private AudioTrack _audioTrack;
-        private float _volume;
         private float _pan;
         public bool Init()
         {
@@ -25,7 +24,7 @@ namespace PiEar.Droid.Interfaces
                     .Build();
                 var format = new AudioFormat.Builder()
                     .SetEncoding(Encoding.Pcm16bit)?
-                    .SetSampleRate(48000)?
+                    .SetSampleRate(44100)?
                     .SetChannelMask(ChannelOut.Mono)
                     .Build();
                 if (attributes == null)
@@ -41,7 +40,7 @@ namespace PiEar.Droid.Interfaces
                 _audioTrack = new AudioTrack.Builder()
                     .SetAudioAttributes(attributes)
                     .SetAudioFormat(format)
-                    .SetBufferSizeInBytes(128 * 2 * 25) // 128 samples per buffer, 2 bytes per buffer, buffer size capable of holding 15 times that. 
+                    .SetBufferSizeInBytes(128 * 2 * 15) // 128 samples per buffer, 2 bytes per buffer, buffer size capable of holding 15 times that. 
                     .SetPerformanceMode(AudioTrackPerformanceMode.LowLatency)
                     .Build();
                 return true;
@@ -52,7 +51,7 @@ namespace PiEar.Droid.Interfaces
                 return false;
             }
         }
-        public bool Buffer(byte[] data)
+        public bool Buffer(short[] data)
         {
             try
             {
@@ -108,14 +107,12 @@ namespace PiEar.Droid.Interfaces
         public bool SetVolume(float volume)
         {
             try {
-                if (volume > 1 || volume < 0 || Math.Abs(volume - _volume) < 0.000001)
+                if (volume > 1 || volume < 0)
                 {
+                    MainActivity.AppLog.ErrorWrite($"Volume must be between 0 and 1");
                     return false;
                 }
-                _volume = volume;
-                float leftVolume = Math.Max(volume + (_pan < 0 ? _pan : 0), 0);
-                float rightVolume = Math.Max(volume - (_pan > 0 ? _pan : 0), 0);
-                _audioTrack.SetStereoVolume(leftVolume, rightVolume); // TODO: This is a deprecated call
+                _audioTrack.SetVolume(volume);
                 return true;
             } catch (Exception e) {
                 MainActivity.AppLog.ErrorWrite($"Failed to set volume: \n {e.Message}");
@@ -130,10 +127,6 @@ namespace PiEar.Droid.Interfaces
                     return false;
                 }
                 _pan = pan;
-                if (!SetVolume(_volume))
-                {
-                    throw new Exception("Failed to set volume after panning");
-                }
                 return true;
             } catch (Exception e) {
                 MainActivity.AppLog.ErrorWrite($"Failed panning: \n {e.Message}");

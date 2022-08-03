@@ -17,9 +17,9 @@ namespace PiEar.Helpers
         public class StreamEvent : EventArgs
         {
             public int Channel { get; }
-            public byte[] Data { get; }
+            public short[] Data { get; }
 
-            public StreamEvent(int channel, byte[] data)
+            public StreamEvent(int channel, short[] data)
             {
                 Channel = channel;
                 Data = data;
@@ -39,8 +39,8 @@ namespace PiEar.Helpers
             else
             {
                 var channel = BitConverter.ToInt16(args.Buffer, 0);
-                var data = new byte[args.Buffer.Length - 2];
-                Array.Copy(args.Buffer, 2, data, 0, data.Length);
+                var data = new short[(args.Buffer.Length / 2) - 1];
+                Buffer.BlockCopy(args.Buffer, 2, data, 0, args.Buffer.Length - 2);
                 StreamEventReceived?.Invoke(null, new StreamEvent(channel, data));
             }
         }

@@ -102,7 +102,8 @@
                                     VerticalOptions="CenterAndExpand"
                                     x:DataType="viewmodels:StreamViewModel">
                                     <Label
-                                        TextColor="Black" WidthRequest="100"
+                                        TextColor="Black"
+                                        WidthRequest="100"
                                         HorizontalOptions="Start"
                                         VerticalTextAlignment="Center"
                                         Text="{Binding Stream.Label}">

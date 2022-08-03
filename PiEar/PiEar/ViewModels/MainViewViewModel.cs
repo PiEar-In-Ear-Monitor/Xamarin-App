@@ -30,7 +30,9 @@ namespace PiEar.ViewModels
                 {
                     return;
                 }
+                Streams[e.Channel].Stream.Mutex.WaitOne();
                 Streams[e.Channel].Stream.Player.Buffer(e.Data);
+                Streams[e.Channel].Stream.Mutex.ReleaseMutex();
             });
         }
         private void LoadClickFile(object sender, EventArgs e)

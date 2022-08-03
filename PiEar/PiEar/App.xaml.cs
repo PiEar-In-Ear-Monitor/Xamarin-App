@@ -1,10 +1,8 @@
 ﻿using PiEar.Helpers;
 using PiEar.Interfaces;
 using PiEar.Views;
-using PiEar.ViewModels;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
-using PiEar.Models;
 using System.Threading.Tasks;
 
 [assembly: XamlCompilation(XamlCompilationOptions.Compile)]
@@ -12,10 +10,11 @@ namespace PiEar
 {
     public partial class App
     {
-        public static ILog Logger = DependencyService.Get<ILog>();
+        public static readonly ILog Logger = DependencyService.Get<ILog>();
         public static bool GlobalMuteStatusValid { get; set; }
         private static bool _globalMuteStatus;
-        public static bool GlobalMuteStatus { get => _globalMuteStatus; }
+        public static bool GlobalMuteStatus => _globalMuteStatus;
+        private readonly IMulticastLock _service = DependencyService.Get<IMulticastLock>();
         public App()
         {
             InitializeComponent();
@@ -34,21 +33,8 @@ namespace PiEar
                     }
                 }
             );
-            var service = DependencyService.Get<IMulticastLock>();
-            service.Acquire();
+            _service.Acquire();
             Networking.FindServerIp();
-        }
-        protected override void OnStart()
-        {
-            // Handle when your app starts
-        }
-        protected override void OnSleep()
-        {
-            // Handle when your app sleeps
-        }
-        protected override void OnResume()
-        {
-            // Handle when your app resumes
         }
     }
 }

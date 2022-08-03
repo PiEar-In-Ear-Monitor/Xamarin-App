@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using PiEar.Annotations;
@@ -17,7 +18,8 @@ namespace PiEar.Models
         private static int _count;
         private string Id { get; } = _count++.ToString();
         private string _label;
-        // public System.IO.Stream Buffer { get; } = new System.IO.MemoryStream( );
+        // Mutex to protect the stream from being modified by multiple threads at the same time.
+        public Mutex Mutex { get; }= new Mutex();
         public IPiearAudio Player { get; }
         // public ISimpleAudioPlayer Player { get; } = CrossSimpleAudioPlayer.CreateSimpleAudioPlayer();
         public string Label

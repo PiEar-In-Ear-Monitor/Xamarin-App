@@ -9,21 +9,19 @@ namespace PiEar.Helpers
 {
     public static class Networking
     {
-        private static bool _foundIp;
-        private static string _serverIp;
         private static UdpClient _udpClient;
-        public static string ServerIp => (_foundIp) ? _serverIp : null;
+        public static string ServerIp { get; private set; } = null;
         public const int Port = 9090;
         public const int MulticastPort = 6666;
         public const string MulticastIp = "224.0.0.69";
-        public static async Task<string> GetRequest(string endpoint, bool forDiscovery = false)
+        public static async Task<string> GetRequest(string endpoint)
         {
-            if (!_foundIp && !forDiscovery) return null;
+            if (ServerIp == null) return null;
             try
             {
-                WebRequest request = WebRequest.Create ($"http://{_serverIp}:{Port}{endpoint}");
+                WebRequest request = WebRequest.Create ($"http://{ServerIp}:{Port}{endpoint}");
                 request.Timeout = 5000;
-                return await _getResp(request);
+                return await _getResp(request).ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -33,13 +31,13 @@ namespace PiEar.Helpers
         }
         public static async Task<string> PutRequest(string endpoint)
         {
-            if (!_foundIp) return null;
+            if (ServerIp == null) return null;
             try
             {
                 WebRequest request = WebRequest.Create($"http://{ServerIp}:{Port}{endpoint}");
                 request.Method = "PUT";
                 request.Timeout = 5000;
-                return await _getResp(request);
+                return await _getResp(request).ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -60,31 +58,12 @@ namespace PiEar.Helpers
                 response.Close();
                 return responseFromServer;
             }
-            catch (Exception e)
+            catch
             {
-                if (e != null)
-                {
-                    Debug.WriteLine($"Failed to get response from server IP {_serverIp}:{Port}");
-                }
                 return "";
             }
         }
-        private static void OnUdpDataReceived(IAsyncResult result)
-        {
-            Debug.WriteLine($">>> in receive");
-
-            var udpClient = result.AsyncState as UdpClient;
-            if (udpClient == null)
-                return;
-
-            IPEndPoint remoteAddr = null;
-            var recvBuffer = udpClient.EndReceive(result, ref remoteAddr);
-
-            Debug.WriteLine($"MESSAGE FROM: {remoteAddr.Address}:{remoteAddr.Port}, MESSAGE SIZE: {recvBuffer?.Length ?? 0}");
-
-            udpClient.BeginReceive(OnUdpDataReceived, udpClient);
-        }
-        public static void FindServerIp()
+        public static Task FindServerIp()
         {
             _udpClient = new UdpClient()
             {
@@ -93,60 +72,18 @@ namespace PiEar.Helpers
             };
             _udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
             _udpClient.Client.Bind(new IPEndPoint(IPAddress.Any, MulticastPort));
-            _udpClient.BeginReceive((result) =>
+            return Task.Run(() =>
             {
-                var udpClient = result.AsyncState as UdpClient;
-                if (udpClient == null)
-                    return;
-                IPEndPoint remoteAddr = null;
-                udpClient.EndReceive(result, ref remoteAddr);
-                _serverIp = remoteAddr.Address.ToString();
-                _foundIp = true;
-                Debug.WriteLine($"Found server IP: {_serverIp}");
-            }, _udpClient);
-            // This was brute force, but it works. Not needed since we can get IP from the multicast packets.
-            // byte[] address = DependencyService.Get<IAddress>().ByteIpAddress();
-            // byte[] gateway = DependencyService.Get<IAddress>().ByteIpGateway();
-            // byte[] toCheck = new byte[4];
-            // int diff = 0;
-            // bool[] maxSet = {false, false, false};
-            // for (int i = 0; i < 4; i++)
-            // {
-            //     toCheck[i] = gateway[i];
-            //     if (address[i] != gateway[i])
-            //     {
-            //         diff = i;
-            //         break;
-            //     }
-            //     else
-            //     {
-            //         maxSet[i] = true;
-            //     }
-            // }
-            // // toCheck[2] = 154; // Save a lot of time!
-            // while (!_foundIp)
-            // {
-            //     for (int i = 0; i < 256; i++)
-            //     {
-            //         byte[] intBytes = BitConverter.GetBytes(i);
-            //         Array.Reverse(intBytes);
-            //         toCheck[3] = intBytes[3];
-            //         _serverIp = new IPAddress(toCheck).ToString();
-            //         if (await GetRequest("/abcdefghijklmnopqrstuvwxyz", true) == "zyxwvutsrqponmlkjihgfedcba")
-            //         {
-            //             _foundIp = true;
-            //             break;
-            //         }
-            //     }
-            //     if (maxSet[0] && maxSet[1] && maxSet[2] && toCheck[3] == 255)
-            //     {
-            //         break;
-            //     }
-            //     if (++toCheck[diff] == 255)
-            //     {
-            //         maxSet[diff++] = true;
-            //     }
-            // }
+                _udpClient.BeginReceive((result) =>
+                {
+                    var udpClient = result.AsyncState as UdpClient;
+                    if (udpClient == null)
+                        return;
+                    IPEndPoint remoteAddr = null;
+                    udpClient.EndReceive(result, ref remoteAddr);
+                    ServerIp = remoteAddr.Address.ToString();
+                }, _udpClient);
+            });
         }
     }
 }
