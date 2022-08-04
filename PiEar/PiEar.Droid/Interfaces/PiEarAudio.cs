@@ -51,7 +51,7 @@ namespace PiEar.Droid.Interfaces
                 return false;
             }
         }
-        public bool Buffer(short[] data)
+        public bool Buffer(byte[] data)
         {
             try
             {

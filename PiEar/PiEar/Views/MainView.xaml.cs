@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using PiEar.ViewModels;
 using Xamarin.Forms;
 
 namespace PiEar.Views
@@ -10,12 +9,18 @@ namespace PiEar.Views
         public MainView() => InitializeComponent();
         protected override void OnAppearing()
         {
-            while (!ViewModel.SetupComplete)
+            Task.Run(() =>
             {
-                Task.Yield();
-            }
-            ListOfChannels.ItemsSource = null;
-            ListOfChannels.ItemsSource = ViewModel.Streams;
+                while (!ViewModel.SetupComplete)
+                {
+                    Task.Delay(500).Wait();
+                }
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    ListOfChannels.ItemsSource = null;
+                    ListOfChannels.ItemsSource = ViewModel.Streams;
+                });
+            });
         }
         private async void OpenSettings(object sender, EventArgs e)
         {

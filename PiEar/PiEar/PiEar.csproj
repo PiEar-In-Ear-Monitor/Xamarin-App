@@ -28,5 +28,6 @@
       <EmbeddedResource Include="Click\Tap.ogg" />
       <EmbeddedResource Include="Click\Wood.ogg" />
       <None Remove="appsettings.json" />
+      <None Remove="Click\audio.raw" />
     </ItemGroup>
 </Project>

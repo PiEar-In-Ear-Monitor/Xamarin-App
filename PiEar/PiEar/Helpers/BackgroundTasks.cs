@@ -17,9 +17,9 @@ namespace PiEar.Helpers
         public class StreamEvent : EventArgs
         {
             public int Channel { get; }
-            public short[] Data { get; }
+            public byte[] Data { get; }
 
-            public StreamEvent(int channel, short[] data)
+            public StreamEvent(int channel, byte[] data)
             {
                 Channel = channel;
                 Data = data;
@@ -29,7 +29,6 @@ namespace PiEar.Helpers
         {
             if (args.Buffer.Length == 4)
             {
-                // For each item in buffer, check if is zero
                 foreach (var item in args.Buffer)
                 {
                     if (item == 0) continue;
@@ -39,8 +38,8 @@ namespace PiEar.Helpers
             else
             {
                 var channel = BitConverter.ToInt16(args.Buffer, 0);
-                var data = new short[(args.Buffer.Length / 2) - 1];
-                Buffer.BlockCopy(args.Buffer, 2, data, 0, args.Buffer.Length - 2);
+                var data = new byte[args.Buffer.Length - 2];
+                Array.Copy(args.Buffer, 2, data, 0, data.Length);
                 StreamEventReceived?.Invoke(null, new StreamEvent(channel, data));
             }
         }
