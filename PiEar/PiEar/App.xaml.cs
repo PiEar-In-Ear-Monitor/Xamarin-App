@@ -14,7 +14,7 @@ namespace PiEar
         public static bool GlobalMuteStatusValid { get; set; }
         private static bool _globalMuteStatus;
         public static bool GlobalMuteStatus => _globalMuteStatus;
-        private readonly IMulticastLock _service = DependencyService.Get<IMulticastLock>();
+        // private readonly IMulticastLock _service = DependencyService.Get<IMulticastLock>();
         public App()
         {
             InitializeComponent();
@@ -33,7 +33,7 @@ namespace PiEar
                     }
                 }
             );
-            _service.Acquire();
+            // _service.Acquire();
             Networking.FindServerIp();
         }
     }

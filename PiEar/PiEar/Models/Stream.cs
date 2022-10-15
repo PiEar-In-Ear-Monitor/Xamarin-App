@@ -18,10 +18,8 @@ namespace PiEar.Models
         private static int _count;
         private string Id { get; } = _count++.ToString();
         private string _label;
-        // Mutex to protect the stream from being modified by multiple threads at the same time.
-        public Mutex Mutex { get; }= new Mutex();
+        public Mutex Mutex { get; } = new Mutex();
         public IPiearAudio Player { get; }
-        // public ISimpleAudioPlayer Player { get; } = CrossSimpleAudioPlayer.CreateSimpleAudioPlayer();
         public string Label
         {
             get => _label;

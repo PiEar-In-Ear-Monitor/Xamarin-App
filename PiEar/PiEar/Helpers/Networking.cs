@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -13,7 +12,7 @@ namespace PiEar.Helpers
         public static string ServerIp { get; private set; } = null;
         public const int Port = 9090;
         public const int MulticastPort = 6666;
-        public const string MulticastIp = "224.0.0.69";
+        public const string MulticastIp = "10.14.2.20";
         public static async Task<string> GetRequest(string endpoint)
         {
             if (ServerIp == null) return null;
@@ -65,25 +64,22 @@ namespace PiEar.Helpers
         }
         public static Task FindServerIp()
         {
-            _udpClient = new UdpClient()
+            return Task.Run( () =>
             {
-                ExclusiveAddressUse = false,
-                EnableBroadcast = true
-            };
-            _udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            _udpClient.Client.Bind(new IPEndPoint(IPAddress.Any, MulticastPort));
-            return Task.Run(() =>
-            {
-                _udpClient.BeginReceive((result) =>
-                {
-                    var udpClient = result.AsyncState as UdpClient;
-                    if (udpClient == null)
-                        return;
-                    IPEndPoint remoteAddr = null;
-                    udpClient.EndReceive(result, ref remoteAddr);
-                    ServerIp = remoteAddr.Address.ToString();
-                }, _udpClient);
+                ServerIp = "10.14.2.20";
             });
+            // return Task.Run(() =>
+            // {
+            //     _udpClient.BeginReceive((result) =>
+            //     {
+            //         var udpClient = result.AsyncState as UdpClient;
+            //         if (udpClient == null)
+            //             return;
+            //         IPEndPoint remoteAddr = null;
+            //         udpClient.EndReceive(result, ref remoteAddr);
+            //         ServerIp = remoteAddr.Address.ToString();
+            //     }, _udpClient);
+            // });
         }
     }
 }

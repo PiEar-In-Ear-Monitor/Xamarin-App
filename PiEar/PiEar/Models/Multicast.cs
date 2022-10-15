@@ -7,24 +7,18 @@ namespace PiEar.Models
     public class Multicast
     {
      UdpClient _udpclient;
-     int _port;
-     IPAddress _multicastIPaddress;
-     IPAddress _localIPaddress;
-     IPEndPoint _localEndPoint;
      IPEndPoint _remoteEndPoint;
 
      public Multicast(IPAddress multicastIPaddress, int port, IPAddress localIPaddress = null)
      {
          // Store params
-         _multicastIPaddress = multicastIPaddress;
-         _port = port;
-         _localIPaddress = localIPaddress;
+         var localIPaddress1 = localIPaddress;
          if (localIPaddress == null)
-             _localIPaddress = IPAddress.Any;
+             localIPaddress1 = IPAddress.Any;
 
          // Create endpoints
-         _remoteEndPoint = new IPEndPoint(_multicastIPaddress, port);
-         _localEndPoint = new IPEndPoint(_localIPaddress, port);
+         _remoteEndPoint = new IPEndPoint(multicastIPaddress, port);
+         var localEndPoint = new IPEndPoint(localIPaddress1, port);
 
          // Create and configure UdpClient
          _udpclient = new UdpClient();
@@ -33,11 +27,13 @@ namespace PiEar.Models
          _udpclient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
          _udpclient.ExclusiveAddressUse = false;
          // Bind, Join
-         _udpclient.Client.Bind(_localEndPoint);
-         _udpclient.JoinMulticastGroup(_multicastIPaddress, _localIPaddress);
+         _udpclient.Client.Bind(localEndPoint);
+         // _udpclient.JoinMulticastGroup(_multicastIPaddress, _localIPaddress);
 
          // Start listening for incoming data
-         _udpclient.BeginReceive(new AsyncCallback(ReceivedCallback), null);
+         byte[] fooData = new byte[1];
+         SendMulticast(fooData);
+         _udpclient.BeginReceive(ReceivedCallback, null);
      }
 
      /// <summary>
@@ -64,7 +60,7 @@ namespace PiEar.Models
              UdpMessageReceived(this, new UdpMessageReceivedEventArgs() { Buffer = receivedBytes });
 
          // Restart listening for udp data packages
-         _udpclient.BeginReceive(new AsyncCallback(ReceivedCallback), null);
+         _udpclient.BeginReceive(ReceivedCallback, null);
      }
 
      /// <summary>
