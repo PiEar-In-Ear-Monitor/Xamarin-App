@@ -8,7 +8,6 @@ namespace PiEar.Helpers
 {
     public static class Networking
     {
-        private static UdpClient _udpClient;
         public static string ServerIp { get; private set; } = null;
         public const int Port = 9090;
         public const int MulticastPort = 6666;
@@ -66,7 +65,7 @@ namespace PiEar.Helpers
         {
             return Task.Run( () =>
             {
-                ServerIp = "10.14.2.20";
+                ServerIp = MulticastIp;
             });
             // return Task.Run(() =>
             // {
